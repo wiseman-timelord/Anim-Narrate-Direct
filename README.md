@@ -8,7 +8,7 @@ The project is being set up with the intent to offer a Gradio-based interface fo
 - **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
   - **Narrator Page**: Features a single-column text box for user input and three buttons: "Gen Sample", "Play Narrate", and "Save As MP3".
   - **Configuration Page**: Allows users to configure TTS parameters, model settings, and view hardware details, with an "Update Settings" button for applying changes.
-- **Dynamic Model Support**: Capable of loading and utilizing various TTS models, especially those available on Hugging Face, like [Hugging Face Voices](https://huggingface.co/voices).
+- **Dynamic Model Support**: Capable of loading and utilizing various TTS models on HuggingFaec like the ones found here [Voices](https://huggingface.co/voices). 
 - **Multi-Language and Multi-Speaker Support**: Supports generating speech in multiple languages and different speaker voices, making it versatile for various narration needs.
 - **Automated File Management**: Manages audio output and settings configuration seamlessly through the interface.
 
