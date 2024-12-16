@@ -41,17 +41,13 @@ Selection; Menu Options = 1-2, Exit Program = X:
 - **Dependencies**: Python 3, Gradio, PyTorch, and other necessary libraries installed within a virtual environment.
 
 ### Usage
-1. **Installation**: Download the latest release and unpack it in a suitable directory.
-2. **Setting Executable**: Ensure the launcher script is executable:
-   ```bash
-   chmod +x Tts-Narrate-Gen.sh
-   ```
-3. **Running the Program**:
-   ```bash
-   sudo ./Tts-Narrate-Gen.sh
-   ```
-   Follow the prompts to install dependencies or launch the main program.
-4. **Web Interface**: Access the Gradio web interface at `http://127.0.0.1:7860` after launching the program.
+1. Installation - Download the latest release and unpack it in a suitable directory.
+2. Setting Executable - Ensure bash script is executable, right click properties enable or `chmod +x Tts-Narrate-Gen.sh`.
+3. Running the Install `sudo ./Tts-Narrate-Gen.sh`, then select `2` from the menu, ensuring to allow internet access.
+4. Insert your chosen model folder containing `*.pth`, to `./models` for example `./models/yourmodelfolder`. 
+3. Running the program `./Tts-Narrate-Gen.sh`, then select `1` from the menu, web interface at `http://127.0.0.1:7860`.
+4. Ensuring to configure appropriately, including selecting model folder location.
+5. Exit program in web viewer, this returns to bash, that then exits gracefully.
 
 ### Development
 Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
