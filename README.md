@@ -46,8 +46,8 @@ Selection; Menu Options = 1-2, Exit Program = X:
 3. Running the Install run `sudo ./Tts-Narrate-Gen.sh`, then select `2` from the menu, ensuring to allow internet access. It will install lilbraries including optimal torch library config for hardware detected.
 4. Insert your chosen model folder containing `*.pth`, to `./models` for example `./models/yourmodelfolder`. 
 3. Running the program run `./Tts-Narrate-Gen.sh`, then select `1` from the menu, then open web interface at `http://127.0.0.1:7860`.
-4. Ensuring to configure appropriately, including selecting model folder location.
-5. Exit program in web viewer, this returns to bash, that then exits gracefully.
+4. In the program, ensure to configure appropriately, including selecting model folder location, then click `Update Settings`.
+5. Exit program via clicking on `Exit Program` in web viewer, then return to terminal, where it exits gracefully.
 
 ### Development
 Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
