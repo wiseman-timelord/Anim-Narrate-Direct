@@ -1,92 +1,76 @@
-Tts-Narrate-Gen
+# Tts-Narrate-Gen
+Status: Alpha
 
-    Status: Alpha
-    Note: The README.md includes initial project setup details. Features and interfaces are near complete, but updates and enhancements are ongoing. See the development branch for the latest updates.
+### Description
+The project is being set up with the intent to offer a Gradio-based interface for generating narrations. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from text. The program can be used for various applications such as creating narrations for images, timed videos, or as part of multimedia presentations.
 
-Description
+### FEATURES
+- **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
+  - **Narrator Page**: Features a single-column text box for user input and three buttons: "Gen Sample", "Play Narrate", and "Save As MP3".
+  - **Configuration Page**: Allows users to configure TTS parameters, model settings, and view hardware details, with an "Update Settings" button for applying changes.
+- **Dynamic Model Support**: Capable of loading and utilizing various TTS models, especially those available on Hugging Face, like [Hugging Face Voices](https://huggingface.co/voices).
+- **Multi-Language and Multi-Speaker Support**: Supports generating speech in multiple languages and different speaker voices, making it versatile for various narration needs.
+- **Automated File Management**: Manages audio output and settings configuration seamlessly through the interface.
 
-Tts-Narrate-Gen is a Python-based text-to-speech application that utilizes advanced machine learning models to generate speech from text. It features a user-friendly Gradio interface, allowing users to input text and produce narrated audio seamlessly. This tool is designed to support various applications, including narration for images or timed videos, making it versatile for both personal and professional use.
+### Preview
+The application's interface is divided into two main parts:
+- **Narration Interface Page**:
 
-FEATURES
+![Narration Interface](media/narration_interface.png)
 
-    Multilingual and Multi-Speaker Model: Utilizes 🐸TTS models capable of voice cloning and language selection.
-    Gradio Interface: Browser-based interactive interface for straightforward operation and immediate feedback.
-    Integrated Setup and Operation: Includes a Bash script that handles setup, execution, and shutdown of the application.
-    Configurable Model Path: Users can specify the model directory for flexible model management.
-    File and Folder Management: Automates the handling of configuration files and outputs.
-    Modularity: Designed with separate scripts for interface logic, model handling, and utility functions.
-    Persistence: Retains session settings and configurations across restarts using YAML-based storage.
+- **Configuration Page**:
 
-Preview
+![Configuration Interface](media/configuration_interface.png)
 
-    The Narrator Page...
-
-preview_image
-
-    The Configuration Page...
-
-preview_image
-
-    The Installer/Launcher...
-
+- **Installer/Launcher**:
+```
 ================================================================================
     Tts-Narrate-Gen - Bash Menu
 ================================================================================
+
     1. Launch Main Program
+
     2. Run Setup-Installer
+
 --------------------------------------------------------------------------------
 Selection; Menu Options = 1-2, Exit Program = X: 
+```
 
-Requirements
+### Requirements
+- **Operating System**: Designed for Linux, Ubuntu/Debian compatible.
+- **Dependencies**: Python 3, Gradio, PyTorch, and other necessary libraries installed within a virtual environment.
 
-    Operating System: Linux, Ubuntu/Debian compatible.
-    Python Environment: Local Python installation within `./venv` to avoid system conflicts.
-    Python Libraries: Requires specific libraries like `gradio`, `torch`, and `TTS` which are installed via the setup script.
-    Hardware: Supports CPU-based operations, with potential expansions for GPU usage in future updates.
-    Internet Connection: Needed for downloading dependencies and model files.
+### Usage
+1. **Installation**: Download the latest release and unpack it in a suitable directory.
+2. **Setting Executable**: Ensure the launcher script is executable:
+   ```bash
+   chmod +x Tts-Narrate-Gen.sh
+   ```
+3. **Running the Program**:
+   ```bash
+   sudo ./Tts-Narrate-Gen.sh
+   ```
+   Follow the prompts to install dependencies or launch the main program.
+4. **Web Interface**: Access the Gradio web interface at `http://127.0.0.1:7860` after launching the program.
 
-Usage
+### Development
+Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
 
-To get started with Tts-Narrate-Gen:
+### Example Use Cases
+Narrate educational content, provide audio for visual presentations, and facilitate language learning with diverse accents and dialects.
 
-    Download the latest release suitable for your system and extract it to a desired directory.
-    Open a terminal in the extracted directory and run the following command to make the Bash script executable:
-        chmod +x Tts-Narrate-Gen.sh
-    Execute the script with:
-        ./Tts-Narrate-Gen.sh
-    Use the menu to run the Setup-Installer (Option 2) to install necessary libraries and set up the environment.
-    Once setup is complete, launch the main program using Option 1. This will open the Gradio interface in your default web browser.
-    Navigate to the Gradio interface to start interacting with the TTS system. Configure model paths and settings in the 'Configuration' tab.
-    To exit, close the Gradio interface and select 'Exit Program' from the Bash menu to ensure proper shutdown.
-
-Example Prompts
-
-    "Hello there! What's the story today?"
-    "Can you narrate the text from the following image for me?"
-    "Adjust the pitch and speed to match a cheerful tone."
-
-Notation
-
-    Recommended models for testing: https://huggingface.co/voices for diverse language and voice options.
-    Note on GPU Support: Currently optimized for CPU usage, with plans to support NVIDIA CUDA in future iterations.
-
-File Structure
-
-Initial File Structure...
-
+### File Structure
+```
 ./
 ├── Tts-Narrate-Gen.sh        # Main Bash launcher script
-├── main_script.py            # Primary script for TTS operations
-├── install_script.py         # Script for setting up the environment
-├── data/ 
-│   ├── persistent.yaml       # Stores configuration and session data
-├── models/                   # Directory for storing model files
+├── main_script.py            # Main program script
+├── install_script.py         # Installation script
+├── data/
+│   ├── persistent.yaml       # Stores user settings and configurations
+├── models/                    # Directory to place model files
 ├── output/                   # Directory for generated audio files
-└── requirements.txt          # Lists dependencies for the project
+└── README.md                 # Project documentation
+```
 
-    Files Created by Installation...
-
-./
-├── venv/                     # Virtual environment directory
-│   ├── *                     # Contains installed Python libraries.
-├── logs/                     # Directory for log files (if implemented).
+## DISCLAIMER:
+This project is currently in Alpha. Features and functionalities are subject to change as development progresses.
