@@ -101,7 +101,7 @@ End_Of_Script() {
 
 # Menu system
 while true; do
-    clear
+    # clear
     print_header_separator
     echo "    Tts-Narrate-Gen - Bash Menu"
     print_header_separator
