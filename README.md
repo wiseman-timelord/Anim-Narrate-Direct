@@ -1,4 +1,4 @@
-# GradioNarrator
+# Tts-Narrate-Gen
 Status: Alpha
 
 ### Descrtiption
