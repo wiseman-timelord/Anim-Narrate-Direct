@@ -2,7 +2,7 @@
 Status: Alpha
 
 ### Description
-The project is being set up with the intent to offer a Gradio-based interface for generating narrations. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from text. The program can be used for various applications such as creating narrations for images, timed videos, or as part of multimedia presentations.
+The project is being set up with the intent to offer a Gradio-based interface for generating narrations. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from text. The program can be used for various applications such as creating narrations for images, timed videos, or as part of multimedia presentations. Narrate educational content, provide audio for visual presentations, and facilitate language learning with diverse accents and dialects.
 
 ### FEATURES
 - **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
@@ -16,11 +16,11 @@ The project is being set up with the intent to offer a Gradio-based interface fo
 The application's interface is divided into two main parts:
 - **Narration Interface Page**:
 
-![Narration Interface](media/narration_interface.png)
+![Narration Interface](media/narratio.png)
 
 - **Configuration Page**:
 
-![Configuration Interface](media/configuration_interface.png)
+![Configuration Interface](media/configuration.png)
 
 - **Installer/Launcher**:
 ```
@@ -55,9 +55,6 @@ Selection; Menu Options = 1-2, Exit Program = X:
 
 ### Development
 Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
-
-### Example Use Cases
-Narrate educational content, provide audio for visual presentations, and facilitate language learning with diverse accents and dialects.
 
 ### File Structure
 ```
