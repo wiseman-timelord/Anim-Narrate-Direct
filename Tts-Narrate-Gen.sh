@@ -1,4 +1,5 @@
 #!/bin/bash
+# Script: `./Tts-Narrate-Gen.sh`
 
 # Track if the virtual environment is active
 ENV_ACTIVE=0
@@ -17,12 +18,10 @@ print_footer_separator() {
 check_sudo() {
     if [[ $EUID -ne 0 ]]; then
         echo "Error: Sudo Authorization Required!"
-        print_footer_separator
         sleep 3
         exit 1
     else
         echo "Sudo authorization confirmed."
-        print_footer_separator
         sleep 1
     fi
 }

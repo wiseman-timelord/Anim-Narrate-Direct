@@ -1,8 +1,13 @@
+# Script: `./install_script.py`
+
 import os
 import subprocess
 from pathlib import Path
 import json
+import urllib.request
+import zipfile
 
+# Constants
 PERSISTENT_FILE = Path("./data/persistent.json")
 VENV_PATH = Path("./venv")
 REQUIREMENTS_FILE = Path("./data/requirements.txt")
@@ -63,13 +68,42 @@ def create_persistent_json():
     PERSISTENT_FILE.chmod(0o777)
     return "Persistent settings saved."
 
+def download_and_install_tts():
+    url = "https://github.com/coqui-ai/TTS/archive/refs/tags/v0.22.0.zip"
+    local_zip_path = Path("./TTS.zip")
+    urllib.request.urlretrieve(url, local_zip_path)
+    with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
+        zip_ref.extractall("./")
+    install_dir = "./TTS-0.22.0"
+    subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-e", install_dir])
+    local_zip_path.unlink()  # Remove the downloaded zip file
+    return f"TTS installed from {install_dir}"
+
 def install_requirements():
+    """
+    Installs Python dependencies and GPU or CPU-specific libraries based on system configuration.
+    """
     try:
         subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "--upgrade", "pip"], check=True)
+
+        if subprocess.getoutput("command -v nvidia-smi"):
+            print("GPU detected. Installing GPU-based dependencies...")
+            subprocess.run([
+                str(VENV_PATH / "bin/python3"), "-m", "pip", "install",
+                "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu117"
+            ], check=True)
+        else:
+            print("No GPU detected. Installing CPU-based dependencies...")
+            subprocess.run([
+                str(VENV_PATH / "bin/python3"), "-m", "pip", "install",
+                "torch", "torchvision", "torchaudio"
+            ], check=True)
+
         subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-r", str(REQUIREMENTS_FILE)], check=True)
-        return "Python libraries installed successfully."
-    except subprocess.CalledProcessError:
-        return "Failed to install from requirements.txt, falling back to manual installation."
+        print("Python libraries installed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Installation failed: {e}")
+        return download_and_install_tts()  # Fallback to direct installation.
 
 def create_virtualenv():
     if not VENV_PATH.exists():
@@ -79,8 +113,7 @@ def create_virtualenv():
     else:
         return "Virtual environment already exists."
 
-def summarize_installation():
-    print("Installation Summary:")
+def main():
     print(check_sudo())
     print(create_folders())
     print(create_data_init_py())
@@ -89,9 +122,6 @@ def summarize_installation():
     print(install_requirements())
     print(create_hardware_details())
     print(create_persistent_json())
-
-def main():
-    summarize_installation()
 
 if __name__ == "__main__":
     main()

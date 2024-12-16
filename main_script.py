@@ -38,9 +38,19 @@ def load_persistent_settings():
                 settings["model_path"] = str(MODEL_DIR)
             return settings
 
-def save_persistent_settings(settings):
+def save_persistent_settings(model_name, speed, pitch, volume_gain, threads_percent):
+    settings = {
+        "model_path": str(MODEL_DIR),
+        "voice_model": model_name,
+        "speed": speed,
+        "pitch": pitch,
+        "volume_gain": volume_gain,
+        "session_history": "",
+        "threads_percent": threads_percent
+    }
     with open(PERSISTENT_FILE, 'w') as f:
         yaml.dump(settings, f)
+    return "Settings updated successfully!"
 
 def load_hardware_details():
     lines = []
@@ -60,27 +70,42 @@ def parse_cpu_threads(hardware_lines):
                 pass
     return threads
 
-def find_and_load_model(model_path):
-    model_directory = Path(model_path)
-    model_files = list(model_directory.glob('*.pth'))
-    if model_files:
-        model_path = model_files[0]  # Select the first .pth file found
-        model = torch.load(model_path, map_location='cpu')  # Load model to CPU
-        print(f"Model loaded from {model_path}")
-        return model
-    else:
-        print(f"No model files found in {model_path}.")
-        return None
+def get_available_models():
+    """
+    Retrieves the list of available TTS models dynamically.
+    """
+    try:
+        return TTS.list_models()
+    except Exception as e:
+        print(f"Error retrieving models: {e}")
+        return []
 
-settings = load_persistent_settings()
-hardware_lines = load_hardware_details()
-cpu_threads = parse_cpu_threads(hardware_lines)
-tts_model = find_and_load_model(settings['model_path'])
+def generate_tts_audio(text, speaker_wav, language, model_name):
+    """
+    Generates TTS audio using the specified model, language, and optional voice cloning.
+    Arguments:
+    - text: The input text to convert to speech.
+    - speaker_wav: Path to the speaker WAV file for cloning (can be None for single-speaker models).
+    - language: The language of the generated speech.
+    - model_name: The TTS model to use.
 
-def generate_tts_audio(text, speaker_wav, language):
+    Returns:
+    - Path to the generated audio file.
+    """
     output_path = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, dir='./output').name
-    tts.tts_to_file(text=text, speaker_wav=speaker_wav, language=language, file_path=output_path)
-    return output_path
+    try:
+        tts = TTS(model_name=model_name).to("cuda" if torch.cuda.is_available() else "cpu")
+        tts.tts_to_file(
+            text=text,
+            speaker_wav=speaker_wav,
+            language=language,
+            file_path=output_path
+        )
+        print(f"Audio successfully generated at {output_path}")
+        return output_path
+    except Exception as e:
+        print(f"Error generating TTS audio: {e}")
+        return None
 
 def convert_wav_to_mp3(wav_path):
     random_hash = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
@@ -88,11 +113,16 @@ def convert_wav_to_mp3(wav_path):
     subprocess.run(["ffmpeg", "-y", "-i", wav_path, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k", mp3_path], check=True)
     return mp3_path
 
+settings = load_persistent_settings()
+hardware_lines = load_hardware_details()
+cpu_threads = parse_cpu_threads(hardware_lines)
+
 with gr.Blocks(title="Gen-Gradio-Voice") as demo:
     with gr.Tab("Narrator"):
         text_input = gr.Textbox(label="Enter Text", lines=3, placeholder="Type your narration here...")
         speaker_input = gr.Textbox(label="Path to Speaker WAV", placeholder="Enter path to speaker WAV file...")
         language_input = gr.Dropdown(label="Language", choices=['en', 'es', 'de', 'fr'], value='en')
+        model_selector = gr.Dropdown(label="Select TTS Model", choices=get_available_models(), value=settings["voice_model"])
         generate_button = gr.Button("Generate Speech")
         play_button = gr.Button("Play Speech")
         save_button = gr.Button("Save as MP3")
@@ -102,7 +132,7 @@ with gr.Blocks(title="Gen-Gradio-Voice") as demo:
 
         generate_button.click(
             fn=generate_tts_audio,
-            inputs=[text_input, speaker_input, language_input],
+            inputs=[text_input, speaker_input, language_input, model_selector],
             outputs=audio_output
         )
 
@@ -116,19 +146,25 @@ with gr.Blocks(title="Gen-Gradio-Voice") as demo:
     with gr.Tab("Configuration"):
         gr.Markdown("### Hardware Details")
         gr.Textbox(label="System Info", value="\n".join(hardware_lines), lines=4, interactive=False)
-        model_path_input = gr.Textbox(label="Model Path", value=settings["model_path"])
-        voice_model_input = gr.Textbox(label="Voice Model", value=settings["voice_model"])
+
+        available_models = get_available_models()
+        model_selector = gr.Dropdown(
+            label="Select TTS Model",
+            choices=available_models,
+            value=settings["voice_model"]
+        )
+        
         speed_slider = gr.Slider(label="Speed", minimum=0.5, maximum=2.0, step=0.1, value=settings["speed"])
         pitch_slider = gr.Slider(label="Pitch", minimum=0.5, maximum=2.0, step=0.1, value=settings["pitch"])
         volume_slider = gr.Slider(label="Volume Gain (dB)", minimum=-10, maximum=10, step=1, value=settings["volume_gain"])
-        threads_percent_slider = gr.Slider(label="Threads Percentage", minimum=1, maximum 100, step=1, value=settings["threads_percent"])
+        threads_percent_slider = gr.Slider(label="Threads Percentage", minimum=1, maximum=100, step=1, value=settings["threads_percent"])
         
         update_button = gr.Button("Update Settings")
         update_status = gr.Textbox(label="Update Status", value="", interactive=False)
 
         update_button.click(
             fn=save_persistent_settings,
-            inputs=[model_path_input, voice_model_input, speed_slider, pitch_slider, volume_slider, threads_percent_slider],
+            inputs=[model_selector, speed_slider, pitch_slider, volume_slider, threads_percent_slider],
             outputs=update_status
         )
 
