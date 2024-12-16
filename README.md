@@ -37,8 +37,8 @@ Selection; Menu Options = 1-2, Exit Program = X:
 ```
 
 ### Requirements
-- **Operating System**: Designed for Linux, Ubuntu/Debian compatible.
-- **Dependencies**: Python 3, Gradio, PyTorch, and other necessary libraries installed within a virtual environment.
+- Linux - Designed for modern Ubuntu/Debian compatible, im specifically using Ubuntu 24.
+- Python3 - It uses modern Python, libraries are installed to the VEnv at `./venv`, and requriemts is at `./data/requirements.txt`.
 
 ### Usage
 1. Installation - Download the latest release and unpack it in a suitable directory.
