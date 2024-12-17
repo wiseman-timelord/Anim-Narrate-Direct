@@ -1,14 +1,9 @@
 import gradio as gr
-import yaml
-import os
+import yaml, os
 from pathlib import Path
-import subprocess
-import tempfile
-import torch
+import subprocess, tempfile, torch
 from TTS.api import TTS
-import hashlib
-import random
-import string
+import hashlib, random, string
 
 # Configuration and hardware file paths
 PERSISTENT_FILE = Path("./data/persistent.yaml")
@@ -83,21 +78,15 @@ def get_available_models():
 def generate_tts_audio(text, speaker_wav, language, model_name):
     """
     Generates TTS audio using the specified model, language, and optional voice cloning.
-    Arguments:
-    - text: The input text to convert to speech.
-    - speaker_wav: Path to the speaker WAV file for cloning (can be None for single-speaker models).
-    - language: The language of the generated speech.
-    - model_name: The TTS model to use.
-
-    Returns:
-    - Path to the generated audio file.
     """
     output_path = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, dir='./output').name
     try:
+        print(f"Loading TTS model '{model_name}'...")
         tts = TTS(model_name=model_name).to("cuda" if torch.cuda.is_available() else "cpu")
+        print("Generating audio...")
         tts.tts_to_file(
             text=text,
-            speaker_wav=speaker_wav,
+            speaker_wav=speaker_wav if speaker_wav else None,
             language=language,
             file_path=output_path
         )

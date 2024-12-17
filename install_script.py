@@ -1,7 +1,6 @@
 # Script: `./install_script.py`
 
-import os
-import subprocess
+import os, re, subprocess
 from pathlib import Path
 import json
 import urllib.request
@@ -69,49 +68,87 @@ def create_persistent_json():
     return "Persistent settings saved."
 
 def download_and_install_tts():
+    """
+    Downloads and installs the TTS library from Coqui AI.
+    """
     url = "https://github.com/coqui-ai/TTS/archive/refs/tags/v0.22.0.zip"
     local_zip_path = Path("./TTS.zip")
+    
+    print("Downloading TTS library...")
     urllib.request.urlretrieve(url, local_zip_path)
+    
     with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
         zip_ref.extractall("./")
     install_dir = "./TTS-0.22.0"
-    subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-e", install_dir])
-    local_zip_path.unlink()  # Remove the downloaded zip file
+    
+    print("Installing TTS library...")
+    try:
+        subprocess.run([
+            str(VENV_PATH / "bin/python3"), "-m", "pip", "install", install_dir
+        ], check=True)
+        print("TTS library installed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error installing TTS library: {e}")
+        exit(1)
+    finally:
+        local_zip_path.unlink()  # Remove the downloaded zip file
+    
     return f"TTS installed from {install_dir}"
+
 
 def install_requirements():
     """
-    Installs Python dependencies and GPU or CPU-specific libraries based on system configuration.
+    Installs required Python dependencies from requirements.txt.
+    Handles GPU-optimized installations of PyTorch if CUDA is detected.
     """
     try:
-        subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "--upgrade", "pip"], check=True)
+        print("Upgrading pip...")
+        subprocess.run([
+            str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "--upgrade", "pip"
+        ], check=True)
 
-        if subprocess.getoutput("command -v nvidia-smi"):
-            print("GPU detected. Installing GPU-based dependencies...")
+        # Detect CUDA version for GPU dependencies
+        cuda_version_output = subprocess.getoutput("nvcc --version")
+        if "release" in cuda_version_output:
+            cuda_version = re.search(r"release (\d+\.\d+)", cuda_version_output).group(1)
+            cuda_tag = "cu" + cuda_version.replace(".", "")
+            torch_wheel_index = f"https://download.pytorch.org/whl/{cuda_tag}/"
+            print(f"GPU detected with CUDA {cuda_version}. Installing GPU-optimized PyTorch...")
             subprocess.run([
                 str(VENV_PATH / "bin/python3"), "-m", "pip", "install",
-                "torch", "torchvision", "torchaudio", "--index-url", "https://download.pytorch.org/whl/cu117"
+                "torch", "torchvision", "torchaudio", "--extra-index-url", torch_wheel_index
             ], check=True)
         else:
-            print("No GPU detected. Installing CPU-based dependencies...")
+            print("No GPU detected. Installing CPU-based PyTorch...")
             subprocess.run([
                 str(VENV_PATH / "bin/python3"), "-m", "pip", "install",
                 "torch", "torchvision", "torchaudio"
             ], check=True)
 
-        subprocess.run([str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-r", str(REQUIREMENTS_FILE)], check=True)
-        print("Python libraries installed successfully.")
+        # Install remaining libraries
+        print("Installing libraries from requirements.txt...")
+        subprocess.run([
+            str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-r", str(REQUIREMENTS_FILE)
+        ], check=True)
+
+        print("Python dependencies installed successfully.")
     except subprocess.CalledProcessError as e:
-        print(f"Installation failed: {e}")
-        return download_and_install_tts()  # Fallback to direct installation.
+        print(f"Dependency installation failed: {e}")
+        return download_and_install_tts()  # Fallback to direct TTS installation
 
 def create_virtualenv():
+    """
+    Creates a virtual environment if it does not already exist.
+    """
     if not VENV_PATH.exists():
+        print("Creating virtual environment...")
         subprocess.run(["python3", "-m", "venv", str(VENV_PATH)], check=True)
         VENV_PATH.chmod(0o777)
-        return "Virtual environment created and permissions set to 777."
+        print("Virtual environment created successfully.")
     else:
-        return "Virtual environment already exists."
+        print("Virtual environment already exists.")
+    return "Virtual environment ready."
+
 
 def main():
     print(check_sudo())

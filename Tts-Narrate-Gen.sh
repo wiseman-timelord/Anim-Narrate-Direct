@@ -27,11 +27,20 @@ check_sudo() {
 }
 
 activate_env_if_needed() {
-    if [ $ENV_ACTIVE -eq 0 ]; then
-        # Activate the virtual environment
-        source ./venv/bin/activate
-        ENV_ACTIVE=1
+    if [ ! -d "./venv" ]; then
+        echo "Virtual environment not found. Creating one now..."
+        python3 -m venv ./venv
+        if [ $? -ne 0 ]; then
+            echo "Error: Failed to create virtual environment. Check Python installation."
+            exit 1
+        fi
+        echo "Virtual environment created successfully."
     fi
+
+    # Activate the virtual environment
+    source ./venv/bin/activate
+    ENV_ACTIVE=1
+    echo "Virtual environment activated."
 }
 
 # Function to run the installer
