@@ -68,9 +68,16 @@ To create a public link, set `share=True` in `launch()`.
 ├── Tts-Narrate-Gen.sh        # Main Bash launcher script
 ├── main_script.py            # Main program script
 ├── install_script.py         # Installation script
+```
+
+## File Created
+```
+./
 ├── data/
 │   ├── persistent.yaml       # Stores user settings and configurations
-├── models/                    # Directory to place model files
+├── venv/
+│   ├── *.*                   # Libraries & Tools installed here
+├── models/                    # Directory to place model folders
 ├── output/                   # Directory for generated audio files
 └── README.md                 # Project documentation
 ```
