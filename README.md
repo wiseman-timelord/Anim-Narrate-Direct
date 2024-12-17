@@ -22,7 +22,7 @@ The application's interface is divided into two main parts:
 
 ![Configuration Interface](media/configuration.png)
 
-- **Installer/Launcher**:
+- Terminal, Menu and Launch:
 ```
 ================================================================================
     Tts-Narrate-Gen - Bash Menu
@@ -33,7 +33,13 @@ The application's interface is divided into two main parts:
     2. Install And Remove
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-2, Exit Program = X: 
+Selection; Menu Options = 1-2, Exit Program = X: 1
+Activating virtual environment...
+Using Python version: Python 3.11.9
+Running main_script.py with virtual environment Python...
+* Running on local URL:  http://0.0.0.0:7860
+
+To create a public link, set `share=True` in `launch()`.
 ```
 
 ### Requirements
