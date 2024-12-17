@@ -66,10 +66,8 @@ Ongoing developments focus on enhancing model compatibility, improving interface
 ```
 
 ### Credits
-- TTS is used, check it out here `https://github.com/coqui-ai/TTS`.
-- 
-
-
+- TTS is used, check it out [TTS](https://github.com/coqui-ai/TTS).
+- Voices on Huggingface [Voices](https://huggingface.co/voices) 
 
 ## DISCLAIMER:
 This project is currently in Alpha. Features and functionalities are subject to change as development progresses.
