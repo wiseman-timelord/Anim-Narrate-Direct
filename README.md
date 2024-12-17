@@ -62,10 +62,6 @@ To create a public link, set `share=True` in `launch()`.
 ### Notation
 - TTS Required Python ~3.11, and had no version for ~3.12 at the time of creation of my project, hence, there is my first linux installer that also installs python.
 
-### Development
-- Correct interface.
-- Test features.
-
 ### File Structure
 ```
 ./
@@ -78,6 +74,10 @@ To create a public link, set `share=True` in `launch()`.
 ├── output/                   # Directory for generated audio files
 └── README.md                 # Project documentation
 ```
+
+### Development
+- Correct interface.
+- Test features.
 
 ### Credits
 - TTS is used, check it out [TTS](https://github.com/coqui-ai/TTS).
