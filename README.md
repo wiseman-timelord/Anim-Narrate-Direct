@@ -50,7 +50,7 @@ Selection; Menu Options = 1-3, Exit Program = X:
 3. Running the program run `./Tts-Narrate-Gen.sh`, then select `1` from the menu, then open web interface at `http://127.0.0.1:7860`.
 4. In the program, ensure to configure appropriately, including selecting model folder location, then click `Update Settings`.
 5. Exit program via clicking on `Exit Program` in web viewer, then return to terminal, where it exits gracefully.
-- For, hardware change and development, option `3. Remove Installation` results in remove installation, excluding, `./models` and `./output`; intended then option `2` to re-install after.  
+- For, hardware change and development, option `3. Remove Installation` results in remove installation, excluding, `./models` and `./output`, amd them select option `2` after to re-install.  
 
 ### Development
 Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
