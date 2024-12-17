@@ -53,6 +53,9 @@ Selection; Menu Options = 1-2, Exit Program = X:
 5. Exit program via clicking on `Exit Program` in web viewer, then return to terminal, where it exits gracefully.
 - For, hardware change and development, option `3. Remove Installation` results in remove installation, excluding, `./models` and `./output`, amd them select option `2` after to re-install.  
 
+### Notation
+- TTS Required Python ~3.11, and had no version for ~3.12 at the time of creation of my project, hence, there is my first linux installer that also installs python.
+
 ### Development
 Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
 
