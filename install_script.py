@@ -20,16 +20,28 @@ def check_sudo():
     print("Sudo authorization confirmed.")
 
 def create_folders():
+    """
+    Creates necessary project directories with 777 permissions.
+    """
     results = {}
     for folder in FOLDERS_TO_CREATE:
         path = Path(folder)
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
-            path.chmod(0o777)  # Ensure all created folders have 777 permissions
+            path.chmod(0o777)
             results[folder] = "Created"
         else:
             results[folder] = "Already exists"
+
+        # Ensure all files and subdirectories inside have 777 permissions
+        for root, dirs, files in os.walk(folder):
+            for dir_ in dirs:
+                Path(os.path.join(root, dir_)).chmod(0o777)
+            for file_ in files:
+                Path(os.path.join(root, file_)).chmod(0o777)
+
     return results
+
 
 def create_data_init_py():
     init_file = Path("./data/__init__.py")
@@ -70,6 +82,7 @@ def create_persistent_json():
 def download_and_install_tts():
     """
     Downloads and installs the TTS library from Coqui AI.
+    Sets 777 permissions for the extracted files and folders.
     """
     url = "https://github.com/coqui-ai/TTS/archive/refs/tags/v0.22.0.zip"
     local_zip_path = Path("./TTS.zip")
@@ -80,7 +93,14 @@ def download_and_install_tts():
     with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
         zip_ref.extractall("./")
     install_dir = "./TTS-0.22.0"
-    
+
+    # Set 777 permissions for all extracted files and folders
+    for root, dirs, files in os.walk(install_dir):
+        for dir_ in dirs:
+            Path(os.path.join(root, dir_)).chmod(0o777)
+        for file_ in files:
+            Path(os.path.join(root, file_)).chmod(0o777)
+
     print("Installing TTS library...")
     try:
         subprocess.run([
@@ -94,6 +114,7 @@ def download_and_install_tts():
         local_zip_path.unlink()  # Remove the downloaded zip file
     
     return f"TTS installed from {install_dir}"
+
 
 
 def install_requirements():
@@ -139,15 +160,22 @@ def install_requirements():
 def create_virtualenv():
     """
     Creates a virtual environment if it does not already exist.
+    Sets 777 permissions for easy development cleanup.
     """
     if not VENV_PATH.exists():
         print("Creating virtual environment...")
         subprocess.run(["python3", "-m", "venv", str(VENV_PATH)], check=True)
         VENV_PATH.chmod(0o777)
-        print("Virtual environment created successfully.")
+        for root, dirs, files in os.walk(VENV_PATH):
+            for dir_ in dirs:
+                Path(os.path.join(root, dir_)).chmod(0o777)
+            for file_ in files:
+                Path(os.path.join(root, file_)).chmod(0o777)
+        print("Virtual environment created successfully with 777 permissions.")
     else:
         print("Virtual environment already exists.")
     return "Virtual environment ready."
+
 
 
 def main():

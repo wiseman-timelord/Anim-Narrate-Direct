@@ -29,11 +29,12 @@ check_sudo() {
 activate_env_if_needed() {
     if [ ! -d "./venv" ]; then
         echo "Virtual environment not found. Creating one now..."
-        python3 -m venv ./venv
+        python3.11 -m venv ./venv
         if [ $? -ne 0 ]; then
             echo "Error: Failed to create virtual environment. Check Python installation."
             exit 1
         fi
+        chmod -R 777 ./venv
         echo "Virtual environment created successfully."
     fi
 
@@ -42,6 +43,47 @@ activate_env_if_needed() {
     ENV_ACTIVE=1
     echo "Virtual environment activated."
 }
+
+# Function to install Python 3.11.9 from source
+install_python_3_11() {
+    print_header_separator
+    echo "    Install Python 3.11.9 - From Source"
+    print_header_separator
+    echo ""
+
+    # Check if Python 3.11.9 is already installed
+    if python3.11 --version 2>/dev/null | grep -q "Python 3.11.9"; then
+        echo "Python 3.11.9 already installed."
+        sleep 1
+        echo "Returning to menu..."
+        sleep 3
+        return
+    fi
+
+    # If not installed, proceed with installation
+    check_sudo
+    echo "Installing required dependencies..."
+    sudo apt update
+    sudo apt install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev \
+    libssl-dev libreadline-dev libffi-dev wget libsqlite3-dev libbz2-dev
+
+    echo "Downloading Python 3.11.9 source..."
+    cd /usr/src
+    sudo wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
+    sudo tar xzf Python-3.11.9.tgz
+
+    echo "Building Python 3.11.9..."
+    cd Python-3.11.9
+    sudo ./configure --enable-optimizations
+    sudo make altinstall
+
+    echo "Verifying Python 3.11 installation..."
+    python3.11 --version
+
+    echo "Python 3.11.9 installed successfully."
+    sleep 2
+}
+
 
 # Function to run the installer
 run_installer() {
@@ -56,34 +98,62 @@ run_installer() {
     sleep 1
 
     activate_env_if_needed
-    python3 ./install_script.py
+    python3.11 ./install_script.py
     if [ $? -ne 0 ]; then
         echo "Error: Installer encountered an issue."
     else
         echo "Installer completed successfully."
     fi
     sleep 2
-    # Returns to menu with environment still active
 }
 
-# Function to launch the main program
-launch_program() {
+# Function to delete installer-created files (except models and output)
+delete_created_files() {
     print_header_separator
-    echo "    Gen-Gradio-Voice - Launcher"
+    echo "    Remove Installation - Cleanup"
     print_header_separator
     echo ""
-    echo "Preparing to launch the main program..."
-    sleep 1
 
-    activate_env_if_needed
-    python3 ./main_script.py
-    if [ $? -ne 0 ]; then
-        echo "Error: Main program exited unexpectedly."
-    else
-        echo "Main program launched successfully."
+    echo "Deleting files and folders created by the installer..."
+    rm -rf ./venv ./data ./TTS-0.22.0 ./TTS.zip ./install_script.pyc ./__pycache__
+
+    # Preserve 'models' and 'output'
+    if [ -d "./models" ]; then
+        echo "Preserving 'models' folder."
     fi
-    sleep 2
-    # Returns to menu with environment still active
+    if [ -d "./output" ]; then
+        echo "Preserving 'output' folder."
+    fi
+
+    echo "Cleanup completed successfully."
+}
+
+# Function for the Install And Remove Submenu
+install_and_remove_menu() {
+    while true; do
+        # clear #-- commented out for debug, do not uncomment, leave in.
+        print_header_separator
+        echo "    Tts-Narrate-Gen - Install And Remove"
+        print_header_separator
+        echo ""
+        echo "    1. Install Python 3.11.9"
+        echo ""
+        echo "    2. Run Program Installer"
+        echo ""
+        echo "    3. Remove Program Files"
+        echo ""
+        print_footer_separator
+        echo -n "Selection; Menu Options = 1-3, Back To Main = B: "
+        read -r choice
+        case "$choice" in
+            1) install_python_3_11 ;;
+            2) run_installer ;;
+            3) delete_created_files ;;
+            B|b) break ;;
+            *) echo "Invalid option, try again." ;;
+        esac
+        sleep 2
+    done
 }
 
 # Function to gracefully end the script
@@ -107,23 +177,23 @@ End_Of_Script() {
     exit 0
 }
 
-# Menu system
+# Main menu system
 while true; do
-    # clear
+    clear
     print_header_separator
     echo "    Tts-Narrate-Gen - Bash Menu"
     print_header_separator
     echo ""
     echo "    1. Launch Main Program"
     echo ""
-    echo "    2. Run Setup-Installer"
+    echo "    2. Install And Remove"
     echo ""
     print_footer_separator
     echo -n "Selection; Menu Options = 1-2, Exit Program = X: "
     read -r choice
     case "$choice" in
         1) launch_program ;;
-        2) run_installer ;;
+        2) install_and_remove_menu ;;
         X|x) End_Of_Script ;;
         *) echo "Invalid option, try again." ;;
     esac
