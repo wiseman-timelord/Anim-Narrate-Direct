@@ -63,7 +63,8 @@ To create a public link, set `share=True` in `launch()`.
 - TTS Required Python ~3.11, and had no version for ~3.12 at the time of creation of my project, hence, there is my first linux installer that also installs python.
 
 ### Development
-Ongoing developments focus on enhancing model compatibility, improving interface usability, and expanding language support.
+- Correct interface.
+- Test features.
 
 ### File Structure
 ```
