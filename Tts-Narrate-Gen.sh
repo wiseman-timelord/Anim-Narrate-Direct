@@ -26,6 +26,22 @@ check_sudo() {
     fi
 }
 
+check_models_exist() {
+    echo "Checking for available models in ./models directory..."
+    MODEL_FOUND=$(find ./models -type f -name "*.pth" | head -n 1)
+
+    if [ -z "$MODEL_FOUND" ]; then
+        echo "Error: No Models Found"
+        sleep 3
+        echo "Insert Voice Models To ./models"
+        sleep 5
+        return 1  # Return failure to caller
+    else
+        echo "Model found: $MODEL_FOUND"
+        return 0  # Success
+    fi
+}
+
 activate_env_if_needed() {
     if [ ! -d "./venv" ]; then
         echo "Virtual environment not found. Creating one now..."
@@ -131,7 +147,7 @@ delete_created_files() {
 # Function for the Install And Remove Submenu
 install_and_remove_menu() {
     while true; do
-        # clear #-- commented out for debug, do not uncomment, leave in.
+        clear #-- commented out for debugging options.
         print_header_separator
         echo "    Tts-Narrate-Gen - Install And Remove"
         print_header_separator
@@ -156,6 +172,34 @@ install_and_remove_menu() {
     done
 }
 
+# Function to activate venv and launch the program
+launch_program() {
+    # Absolute path to the virtual environment's Python interpreter
+    VENV_PYTHON="./venv/bin/python3.11"
+
+    # Check if Python 3.11.9 exists in venv
+    if [ ! -f "$VENV_PYTHON" ]; then
+        echo "Error: Python 3.11.9 not found in virtual environment. Please run the installer."
+        exit 1
+    fi
+
+    # Activate the virtual environment
+    echo "Activating virtual environment..."
+    source ./venv/bin/activate
+
+    # Confirm Python version in venv
+    echo "Using Python version: $($VENV_PYTHON --version)"
+
+    # Run the main Python script using the venv interpreter
+    echo "Running main_script.py with virtual environment Python..."
+    $VENV_PYTHON ./main_script.py
+
+    # Deactivate the virtual environment after program exit
+    deactivate
+}
+
+
+
 # Function to gracefully end the script
 End_Of_Script() {
     clear
@@ -179,7 +223,7 @@ End_Of_Script() {
 
 # Main menu system
 while true; do
-    clear
+    # clear  #-- commented out for debugging options.
     print_header_separator
     echo "    Tts-Narrate-Gen - Bash Menu"
     print_header_separator

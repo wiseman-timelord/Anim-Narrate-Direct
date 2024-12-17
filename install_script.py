@@ -2,12 +2,11 @@
 
 import os, re, subprocess
 from pathlib import Path
-import json
 import urllib.request
 import zipfile
 
 # Constants
-PERSISTENT_FILE = Path("./data/persistent.json")
+PERSISTENT_FILE = Path("./data/persistent.yaml")
 VENV_PATH = Path("./venv")
 REQUIREMENTS_FILE = Path("./data/requirements.txt")
 HARDWARE_FILE = Path("./data/hardware_details.txt")
@@ -57,6 +56,7 @@ pydub
 ffmpeg-python
 huggingface_hub
 PyYAML
+gradio
 TTS
 """
     REQUIREMENTS_FILE.write_text(requirements)
@@ -73,13 +73,23 @@ def create_hardware_details():
     HARDWARE_FILE.chmod(0o777)
     return "Hardware details saved."
 
-def create_persistent_json():
-    persistent_content = {"voice_model": "default", "speed": 1.0, "pitch": 1.0, "volume_gain": 0.0, "session_history": "", "threads_percent": 80, "model_path": "./models"}
+def create_persistent_yaml():
+    """
+    Manually creates the persistent.yaml file with default settings.
+    """
+    persistent_content = """model_path: ./models
+voice_model: default
+speed: 1.0
+pitch: 1.0
+volume_gain: 0.0
+session_history: ''
+threads_percent: 80
+save_format: mp3
+"""
     with open(PERSISTENT_FILE, 'w') as f:
-        json.dump(persistent_content, f, indent=4)
-    PERSISTENT_FILE.chmod(0o777)
-    return "Persistent settings saved."
-
+        f.write(persistent_content)
+    PERSISTENT_FILE.chmod(0o777)  # Set permissions for easy access
+    return "Persistent YAML file created."
 
 def install_requirements():
     """
@@ -146,8 +156,6 @@ def create_virtualenv():
         print("Virtual environment already exists.")
     return "Virtual environment ready."
 
-
-
 def main():
     print(check_sudo())
     print(create_folders())
@@ -156,7 +164,7 @@ def main():
     print(create_virtualenv())
     print(install_requirements())
     print(create_hardware_details())
-    print(create_persistent_json())
+    print(create_persistent_yaml())
 
 if __name__ == "__main__":
     main()
