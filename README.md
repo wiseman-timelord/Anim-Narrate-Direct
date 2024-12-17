@@ -16,11 +16,11 @@ The project is being set up with the intent to offer a Gradio-based interface fo
 The application's interface is divided into two main parts:
 - **Narration Interface Page**:
 
-![Narration Interface](media/narratio.png)
+![Narration Interface](media/narrate.png)
 
 - **Configuration Page**:
 
-![Configuration Interface](media/configuration.png)
+![Configuration Interface](media/configure.png)
 
 - Terminal, Menu and Launch:
 ```
