@@ -57,6 +57,7 @@ pydub
 ffmpeg-python
 huggingface_hub
 PyYAML
+TTS
 """
     REQUIREMENTS_FILE.write_text(requirements)
     REQUIREMENTS_FILE.chmod(0o777)
@@ -78,43 +79,6 @@ def create_persistent_json():
         json.dump(persistent_content, f, indent=4)
     PERSISTENT_FILE.chmod(0o777)
     return "Persistent settings saved."
-
-def download_and_install_tts():
-    """
-    Downloads and installs the TTS library from Coqui AI.
-    Sets 777 permissions for the extracted files and folders.
-    """
-    url = "https://github.com/coqui-ai/TTS/archive/refs/tags/v0.22.0.zip"
-    local_zip_path = Path("./TTS.zip")
-    
-    print("Downloading TTS library...")
-    urllib.request.urlretrieve(url, local_zip_path)
-    
-    with zipfile.ZipFile(local_zip_path, 'r') as zip_ref:
-        zip_ref.extractall("./")
-    install_dir = "./TTS-0.22.0"
-
-    # Set 777 permissions for all extracted files and folders
-    for root, dirs, files in os.walk(install_dir):
-        for dir_ in dirs:
-            Path(os.path.join(root, dir_)).chmod(0o777)
-        for file_ in files:
-            Path(os.path.join(root, file_)).chmod(0o777)
-
-    print("Installing TTS library...")
-    try:
-        subprocess.run([
-            str(VENV_PATH / "bin/python3"), "-m", "pip", "install", install_dir
-        ], check=True)
-        print("TTS library installed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error installing TTS library: {e}")
-        exit(1)
-    finally:
-        local_zip_path.unlink()  # Remove the downloaded zip file
-    
-    return f"TTS installed from {install_dir}"
-
 
 
 def install_requirements():
@@ -151,6 +115,12 @@ def install_requirements():
         subprocess.run([
             str(VENV_PATH / "bin/python3"), "-m", "pip", "install", "-r", str(REQUIREMENTS_FILE)
         ], check=True)
+
+        print("Python dependencies installed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Dependency installation failed: {e}")
+        exit(1)  # Exit if dependencies fail to install
+
 
         print("Python dependencies installed successfully.")
     except subprocess.CalledProcessError as e:
