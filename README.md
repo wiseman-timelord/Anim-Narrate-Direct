@@ -30,12 +30,10 @@ The application's interface is divided into two main parts:
 
     1. Launch Main Program
 
-    2. Run Installer Script
-
-    3. Remove Installation
+    2. Install And Remove
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-3, Exit Program = X: 
+Selection; Menu Options = 1-2, Exit Program = X: 
 ```
 
 ### Requirements
