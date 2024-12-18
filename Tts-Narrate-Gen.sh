@@ -26,22 +26,6 @@ check_sudo() {
     fi
 }
 
-check_models_exist() {
-    echo "Checking for available models in ./models directory..."
-    MODEL_FOUND=$(find ./models -type f -name "*.pth" | head -n 1)
-
-    if [ -z "$MODEL_FOUND" ]; then
-        echo "Error: No Models Found"
-        sleep 3
-        echo "Insert Voice Models To ./models"
-        sleep 5
-        return 1  # Return failure to caller
-    else
-        echo "Model found: $MODEL_FOUND"
-        return 0  # Success
-    fi
-}
-
 activate_env_if_needed() {
     if [ ! -d "./venv" ]; then
         echo "Virtual environment not found. Creating one now..."

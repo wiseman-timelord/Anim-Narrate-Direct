@@ -1,140 +1,151 @@
-# Script: `./main_script.py`
+# ./main_script.py
 
-import gradio as gr
-import yaml, os
+import os
 from pathlib import Path
-import subprocess, tempfile, torch
-from TTS.api import TTS
-import hashlib, random, string
+import torch
+import yaml
 
-# Configuration and hardware file paths
+# Import utilities and interface
+from scripts import utility
+from scripts.utility import exit_program
+from scripts.interface import create_interface
+
+
+# Globals
+CACHED_TEXT = {"text": None, "audio_path": None}  # Ensure this global is defined
 PERSISTENT_FILE = Path("./data/persistent.yaml")
-HARDWARE_FILE = Path("./data/hardware_details.txt")
-MODEL_DIR = Path("./models")  # Default model directory
-CACHED_TEXT = {"text": None, "audio_path": None}  # Cache for input text and generated audio
+MODEL_DIR = Path("./models")
+OUTPUT_DIR = Path("./output")
+NVIDIA_DIR = Path("./venv/lib/python3.11/site-packages/nvidia")
 
-# Utility Functions
-def load_persistent_settings():
-    """
-    Loads persistent settings from persistent.yaml.
-    If the file doesn't exist, default settings are returned.
-    """
-    if not PERSISTENT_FILE.exists():
-        default_settings = {
-            "model_path": "./models",
-            "voice_model": "default",
-            "speed": 1.0,
-            "pitch": 1.0,
-            "volume_gain": 0.0,
-            "session_history": "",
-            "threads_percent": 80,
-            "save_format": "mp3"
-        }
-        with open(PERSISTENT_FILE, 'w') as f:
-            yaml.dump(default_settings, f)
-        return default_settings
+GLOBAL_DEVICE = "cuda" if NVIDIA_DIR.exists() and torch.cuda.is_available() else "cpu"
+print(f"Global device set to: {GLOBAL_DEVICE}")
+
+# Load initial settings
+settings = utility.load_persistent_settings(PERSISTENT_FILE)
+device = utility.detect_device(NVIDIA_DIR)
+
+available_models = utility.get_available_models(MODEL_DIR)
+settings, _ = utility.validate_and_set_default_model(
+    settings,
+    available_models,
+    PERSISTENT_FILE,
+    utility.save_persistent_settings,
+    lambda: utility.detect_device(NVIDIA_DIR)
+)
+
+if device == "CPU":
+    tp = settings.get("threads_percent", 80)
+    total_threads = os.cpu_count() or 1
+    threads_to_set = max(1, int(total_threads * (tp / 100)))
+    torch.set_num_threads(threads_to_set)
+    threads_slider_initial_visible = True
+else:
+    threads_slider_initial_visible = False
+
+default_model = settings["voice_model"] if settings["voice_model"] in available_models else (available_models[0] if available_models else "No models available")
+initial_audio_status = "New Session"
+
+
+# Handler functions (remain here to access globals)
+def handle_generate_and_play(text):
+    global CACHED_TEXT  # Explicitly declare to modify the global variable
+    audio_status = "Generating Audio"
+    audio_path = utility.generate_tts_audio(text, settings["voice_model"], MODEL_DIR, GLOBAL_DEVICE, CACHED_TEXT)
+    if audio_path:
+        audio_status = "Audio Generated"
     else:
-        with open(PERSISTENT_FILE, 'r') as f:
-            return yaml.safe_load(f)
+        audio_status = "Error Generating Audio"
+    return audio_status
 
 
-def save_persistent_settings(model_name, speed, pitch, save_format):
-    """
-    Saves updated settings to persistent.yaml.
-    """
-    settings = {
-        "model_path": "./models",
-        "voice_model": model_name,
-        "speed": speed,
-        "pitch": pitch,
-        "volume_gain": 0.0,  # Default volume gain for now
-        "session_history": "",
-        "threads_percent": 80,
-        "save_format": save_format
-    }
-    with open(PERSISTENT_FILE, 'w') as f:
-        yaml.dump(settings, f)
-    return "Settings updated successfully!"
 
-
-def get_available_models():
-    model_list = []
-    for root, _, files in os.walk(MODEL_DIR):
-        for file in files:
-            if file.endswith(".pth"):
-                relative_path = os.path.relpath(os.path.join(root, file), MODEL_DIR)
-                model_list.append(relative_path)
-    return model_list if model_list else ["No models available"]
-
-def generate_tts_audio(text, model_name):
-    # Check if the cached audio can be reused
-    if CACHED_TEXT["text"] == text and CACHED_TEXT["audio_path"]:
-        return CACHED_TEXT["audio_path"]
-
-    # Generate new audio
-    output_path = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, dir='./output').name
-    try:
-        model_path = os.path.join(MODEL_DIR, model_name)
-        print(f"Loading TTS model from '{model_path}'...")
-        tts = TTS(model_path=model_path).to("cuda" if torch.cuda.is_available() else "cpu")
-        tts.tts_to_file(text=text, file_path=output_path)
-        CACHED_TEXT.update({"text": text, "audio_path": output_path})
-        return output_path
-    except Exception as e:
-        print(f"Error generating TTS audio: {e}")
-        return None
-
-def save_audio(audio_path, preferred_format):
-    random_hash = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-    output_name = f"./output/{random_hash}.{preferred_format}"
-    if preferred_format == "mp3":
-        subprocess.run(["ffmpeg", "-y", "-i", audio_path, "-vn", "-ar", "44100", "-ac", "2", "-b:a", "192k", output_name], check=True)
+def handle_save_audio():
+    global CACHED_TEXT  # Access the global variable
+    if CACHED_TEXT["audio_path"]:
+        saved_path = utility.save_audio(CACHED_TEXT["audio_path"], settings["save_format"], settings["volume_gain"])
+        if saved_path:
+            return "Audio Saved"
+        else:
+            return "Error Saving Audio"
     else:
-        os.rename(audio_path, output_name)
-    return output_name
+        return "No Audio To Save"
 
-# Load configurations
-settings = load_persistent_settings()
-available_models = get_available_models()
-default_model = available_models[0] if available_models else "No models available"
 
-# Gradio Interface
-with gr.Blocks(title="Gen-Gradio-Voice") as demo:
-    with gr.Tab("Narrator"):
-        text_input = gr.Textbox(label="Enter Text", lines=3)
-        model_selector = gr.Dropdown(label="Select TTS Model", choices=available_models, value=default_model)
-        generate_button = gr.Button("Generate Speech")
-        save_button = gr.Button("Save Narration")
-        audio_output = gr.Audio(label="Output Audio", type="filepath")
-        save_status = gr.Textbox(label="Save Status", interactive=False)
+def handle_restart_session():
+    print("Restarting session and reloading settings...")
+    global settings, device, available_models
 
-        # Generate and Play Immediately
-        def generate_and_play(text, model_name):
-            audio_path = generate_tts_audio(text, model_name)
-            return audio_path
+    # Reload settings
+    settings = utility.load_persistent_settings(PERSISTENT_FILE)
+    device = utility.detect_device(NVIDIA_DIR)
+    available_models = utility.get_available_models(MODEL_DIR)
 
-        generate_button.click(fn=generate_and_play, inputs=[text_input, model_selector], outputs=audio_output)
+    if device == "CPU":
+        tp = settings.get("threads_percent", 80)
+        total_threads = os.cpu_count() or 1
+        threads_to_set = max(1, int(total_threads * (tp / 100)))
+        print(f"Setting number of threads to: {threads_to_set}")
+        torch.set_num_threads(threads_to_set)
+        visible = True
+    else:
+        visible = False
 
-        # Save the audio in preferred format
-        def save_audio_action():
-            return save_audio(CACHED_TEXT["audio_path"], settings["save_format"])
+    if settings["voice_model"] not in available_models:
+        print(f"Current voice_model '{settings['voice_model']}' not found in available models. Updating settings.")
+        if available_models and available_models[0] != "No models available":
+            settings["voice_model"] = available_models[0]
+        else:
+            settings["voice_model"] = "No models available"
 
-        save_button.click(fn=save_audio_action, outputs=save_status)
-
-    with gr.Tab("Configuration"):
-        gr.Markdown("### Configuration Options")
-        gr.Textbox(label="Available Models", value="\n".join(available_models), lines=5, interactive=False)
-        speed_slider = gr.Slider(label="Speed", minimum=0.5, maximum=2.0, step=0.1, value=settings["speed"])
-        pitch_slider = gr.Slider(label="Pitch", minimum=0.5, maximum=2.0, step=0.1, value=settings["pitch"])
-        save_format_dropdown = gr.Dropdown(label="Preferred Save Format", choices=["mp3", "wav"], value=settings["save_format"])
-        update_button = gr.Button("Update Settings")
-        update_status = gr.Textbox(label="Update Status", interactive=False)
-
-        update_button.click(
-            fn=save_persistent_settings,
-            inputs=[model_selector, speed_slider, pitch_slider, save_format_dropdown],
-            outputs=update_status
+        settings, _ = utility.save_persistent_settings(
+            PERSISTENT_FILE,
+            settings["voice_model"],
+            settings["speed"],
+            settings["pitch"],
+            settings["volume_gain"],
+            settings["threads_percent"],
+            settings["save_format"],
+            lambda: utility.detect_device(NVIDIA_DIR)
         )
 
-demo.launch(server_name="0.0.0.0", server_port=7860)
+    print("Session restarted and settings reloaded.")
+    return "Session Restarted and Settings Reloaded!", gr.update(visible=visible)
+
+
+def handle_update_settings(model_name, speed, pitch, volume_gain, threads_percent, save_format):
+    updated_settings, msg = utility.save_persistent_settings(
+        PERSISTENT_FILE,
+        model_name,
+        speed,
+        pitch,
+        volume_gain,
+        threads_percent,
+        save_format,
+        lambda: utility.detect_device(NVIDIA_DIR)
+    )
+    # Update global settings after saving
+    global settings
+    settings = updated_settings
+    return msg
+
+
+def main():
+    demo = create_interface(
+        available_models=available_models,
+        default_model=default_model,
+        initial_audio_status=initial_audio_status,
+        settings=settings,
+        threads_slider_initial_visible=threads_slider_initial_visible,
+        handle_generate_and_play=handle_generate_and_play,
+        handle_save_audio=handle_save_audio,
+        handle_restart_session=handle_restart_session,
+        exit_program=exit_program,  # Directly pass the function
+        handle_update_settings=handle_update_settings
+    )
+    demo.launch(server_name="0.0.0.0", server_port=6942)
+
+
+if __name__ == "__main__":
+    main()
 

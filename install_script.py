@@ -1,6 +1,8 @@
 # Script: `./install_script.py`
 
-import os, re, subprocess
+import os
+import re
+import subprocess
 from pathlib import Path
 import urllib.request
 import zipfile
@@ -40,7 +42,6 @@ def create_folders():
                 Path(os.path.join(root, file_)).chmod(0o777)
 
     return results
-
 
 def create_data_init_py():
     init_file = Path("./data/__init__.py")
@@ -131,12 +132,6 @@ def install_requirements():
         print(f"Dependency installation failed: {e}")
         exit(1)  # Exit if dependencies fail to install
 
-
-        print("Python dependencies installed successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Dependency installation failed: {e}")
-        return download_and_install_tts()  # Fallback to direct TTS installation
-
 def create_virtualenv():
     """
     Creates a virtual environment if it does not already exist.
@@ -168,4 +163,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
