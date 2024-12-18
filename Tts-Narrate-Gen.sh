@@ -131,7 +131,7 @@ delete_created_files() {
 # Function for the Install And Remove Submenu
 install_and_remove_menu() {
     while true; do
-        clear #-- commented out for debugging options.
+        # clear #-- commented out for debugging options.
         print_header_separator
         echo "    Tts-Narrate-Gen - Install And Remove"
         print_header_separator
