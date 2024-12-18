@@ -84,7 +84,7 @@ To create a public link, set `share=True` in `launch()`.
 ```
 
 ### Development
-- TTS is not maintained, need `coqui-tts`, possibly it will fix the issues I have had, or otherwise will have to consider other options.
+- TTS is not maintained, need `coqui-tts`, possibly it will fix the issues I have had, or otherwise will have to consider other options. Is it 3.12?
 - Correct interface.
 - Test features.
 
