@@ -112,6 +112,12 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
 
     if settings["voice_model"] not in available_models:
         print(f"Default model '{settings['voice_model']}' not found. Selecting the first available model.")
+        
+        # Print the model folder that contains the .pth file
+        if available_models:
+            selected_model_folder = available_models[0].split("/")[0]  # Extract the folder name
+            print(f"Selected model folder: {selected_model_folder}")
+        
         settings["voice_model"] = available_models[0]
         updated_settings, msg = save_persistent_settings_func(
             persistent_file,
@@ -125,7 +131,6 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
         )
         return updated_settings, True
     return settings, True
-
 
 def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
     """
@@ -142,6 +147,11 @@ def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
         supplemental_dir = (model_root / "supplemental").resolve()
         speakers_file = (supplemental_dir / "speakers-base.json").resolve()
 
+        # Print the model path and folder contents for debugging
+        print(f"Model checkpoint path: {model_checkpoint}")
+        print(f"Model root folder: {model_root}")
+        print(f"Contents of model root folder: {os.listdir(model_root)}")
+
         # Validate required files
         required_paths = {
             "model_checkpoint": model_checkpoint,
@@ -152,6 +162,15 @@ def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
         missing_paths = [key for key, path in required_paths.items() if not path.exists()]
         if missing_paths:
             raise FileNotFoundError(f"Missing required paths: {', '.join(missing_paths)}")
+
+        # Inspect the model file before loading it
+        try:
+            print("Inspecting model file...")
+            model_data = torch.load(model_checkpoint, map_location="cpu")
+            print("Model file inspected successfully.")
+        except Exception as e:
+            print(f"Error inspecting model file: {e}")
+            return None
 
         # Load TTS model
         os.chdir(model_root)  # Change to the model directory

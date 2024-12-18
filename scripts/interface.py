@@ -17,8 +17,14 @@ def create_interface(
     with gr.Blocks(title="Gen-Gradio-Voice") as demo:
         with gr.Tab("Narrate"):
             gr.Markdown("### Narration Interface")
-            text_input = gr.Textbox(label="Enter Text", lines=6)
+            gr.Textbox(
+                value=default_model,  # Replace with settings["voice_model"] if dynamic
+                label="Current Model",
+                interactive=False  # This makes it non-editable
+            )
             audio_status = gr.Textbox(label="Audio Status", value=initial_audio_status, interactive=False)
+            text_input = gr.Textbox(label="Enter Text", lines=10)
+            
             with gr.Row():
                 generate_button = gr.Button("Generate And Play")
                 save_button = gr.Button("Save Audio")
