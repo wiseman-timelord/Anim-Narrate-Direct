@@ -20,7 +20,7 @@ The application's interface is divided into two main parts:
 
 - **Configuration Page**:
 
-![Configuration Interface](media/configure.png)
+![Configuration Interface](media/configure_page.png)
 
 - Terminal, Menu and Launch:
 ```
