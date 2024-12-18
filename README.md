@@ -45,7 +45,7 @@ To create a public link, set `share=True` in `launch()`.
 ### Requirements
 - Linux - Designed for modern Ubuntu/Debian compatible, im specifically using Ubuntu 24.
 - Python3 - It uses modern Python, libraries are installed to the VEnv at `./venv`, and requriemts is at `./data/requirements.txt`.
-- TTS Models - [Voices](https://huggingface.co/voices) is what its programme towards. Ensure to use `lfs` if you are cloning. 
+- TTS Models - Programmed towards [Voices](https://huggingface.co/voices), ensure strictly to use `lfs` when you are clone. 
 
 ### Usage
 1. Installation - Download the latest release and unpack it in a suitable directory.
