@@ -45,6 +45,7 @@ To create a public link, set `share=True` in `launch()`.
 ### Requirements
 - Linux - Designed for modern Ubuntu/Debian compatible, im specifically using Ubuntu 24.
 - Python3 - It uses modern Python, libraries are installed to the VEnv at `./venv`, and requriemts is at `./data/requirements.txt`.
+- TTS Models - [Voices](https://huggingface.co/voices) is what its programme towards. Ensure to use `lfs` if you are cloning. 
 
 ### Usage
 1. Installation - Download the latest release and unpack it in a suitable directory.
@@ -52,7 +53,7 @@ To create a public link, set `share=True` in `launch()`.
 3. Running the Install run `sudo ./Tts-Narrate-Gen.sh`, then select `2` from the menu, ensuring to allow internet access...
 - If you do not have Python 3.11.9 installed, then you must then select `1` on the submenu to install Python 3.11.9 in the system, if its already installed it will tell you and return to menu. 
 - If/when you have python 3.11.9 installed, then select `2` from the submenu, to, install the program requirements in `./venv` and unpack the program.
-4. After installing, requirements and program, ensure the Voice model folders containing `.pth` files to `./models` for example `./models/yourmodelfolder`. 
+4. After installing, requirements and program, ensure the Voice model folders containing `.pth` files to `./models` for example `./models/VCTK_British_English_Males`. 
 5. On main menu in bash you may now select `1` from the main menu, this will runn the program script, and then open web interface at `http://127.0.0.1:7860`.
 4. In the program, ensure to configure appropriately on `Configure` page, including selecting model folder location, then click `Update Settings`.
 5. On `Narrate` page, Enter text into the editable text box, then click `Generate Narration`, then play narration, and save it if you like. 
