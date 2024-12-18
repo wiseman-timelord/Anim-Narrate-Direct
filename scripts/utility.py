@@ -1,12 +1,8 @@
 # ./scripts/utility.py
 
-import os
-import yaml
-import tempfile
+import os, json, yaml, tempfile
 from pydub import AudioSegment
-import random
-import string
-import torch
+import random, string, torch
 from TTS.api import TTS
 from pathlib import Path
 
@@ -176,8 +172,17 @@ def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
         os.chdir(model_root)  # Change to the model directory
         tts = TTS(model_path=str(model_checkpoint), config_path=str(config_path)).to(global_device)
 
+        # Check if the model is multi-speaker
+        if tts.is_multi_speaker:
+            # Load the speakers file to get the speaker index
+            with open(speakers_file, 'r') as f:
+                speakers = json.load(f)
+            speaker_idx = speakers[0]  # Use the first speaker in the list
+        else:
+            speaker_idx = None  # Single-speaker model, no speaker index needed
+
         # Generate and save audio
-        tts.tts_to_file(text=text, file_path=output_path, speaker_idx="VCTK_p226", language_idx="en")
+        tts.tts_to_file(text=text, file_path=output_path, speaker_idx=speaker_idx, language_idx="en")
         cached_text.update({"text": text, "audio_path": output_path})
         return output_path
 
@@ -189,6 +194,7 @@ def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
         return None
     finally:
         os.chdir(original_cwd)  # Restore the original working directory
+
 
 def save_audio(audio_path, preferred_format, volume_gain):
     # save audio
