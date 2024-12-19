@@ -30,7 +30,7 @@ The application's interface is divided into two main parts:
 
     1. Launch Tts-Narrate-Gen
 
-    2. Check/Manage Libraries/Files
+    2. Manage Libraries/Files
 
 --------------------------------------------------------------------------------
 Selection; Menu Options = 1-2, Exit Program = X: 
