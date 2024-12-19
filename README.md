@@ -60,14 +60,19 @@ Selection; Menu Options = 1-3, Exit Program = X:
 - TTS Required Python ~3.11, and had no version for ~3.12 at the time of creation of my project, hence, there is my first linux installer that also installs python.
 
 ### File Structure
+- 5 Scripts...
 ```
 ./
 ├── Tts-Narrate-Gen.sh        # Main Bash launcher script
 ├── main_script.py            # Main program script
-├── install_script.py         # Installation script
+├── scripts/
+│   ├── interface.py        # Gradio Interface
+│   ├── generate.py         # Model Handling
+│   ├── utility.py          # All other functions
 ```
 
 ## File Created
+- Files created by installer...
 ```
 ./
 ├── data/
