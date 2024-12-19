@@ -28,24 +28,16 @@ The application's interface is divided into two main parts:
     Tts-Narrate-Gen - Bash Menu
 ================================================================================
 
-    1. Launch Tts-Narrate-Gen
+    1. Launch Main Program
 
-    2. Install Libraries And Files.
+    2. Check/Get Python 3.11
 
-    3. Remove Installations.
+    3. Install Program Files
+
+    4. Remove Program Files
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-3, Exit Program = X: 1
-Activating virtual environment...
-Using Python version: Python 3.12.7
-Launching Tts-Narrate-Gen...
-Detecting device...
-Device detected: cuda
-Global device set to: cuda
-* Running on local URL:  http://0.0.0.0:6942
-
-To create a public link, set `share=True` in `launch()`.
-
+Selection; Menu Options = 1-4, Exit Program = X:
 ```
 
 ### Requirements
