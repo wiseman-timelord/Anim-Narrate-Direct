@@ -3,6 +3,7 @@
 import os
 import yaml
 from pathlib import Path
+import psutil
 
 def load_persistent_settings(persistent_file):
     # load settings
@@ -23,53 +24,76 @@ def load_persistent_settings(persistent_file):
         with open(persistent_file, 'r') as f:
             return yaml.safe_load(f)
 
-
 def save_persistent_settings(
-    persistent_file, 
-    model_name, 
-    speed, 
-    pitch, 
-    volume_gain, 
-    threads_percent, 
-    save_format, 
-    detect_device_func
-):
+    persistent_file: Path, 
+    model_name: str, 
+    speed: float, 
+    pitch: float, 
+    volume_gain: float, 
+    threads_percent: int, 
+    save_format: str
+) -> tuple[dict, str]:
     """
     Save settings with validation and default handling.
+    
+    Args:
+        persistent_file: Path to settings file
+        model_name: Name of the TTS model
+        speed: Speech speed multiplier (0.5-2.0)
+        pitch: Voice pitch multiplier (0.5-2.0)
+        volume_gain: Volume adjustment in dB (-20.0-20.0)
+        threads_percent: CPU thread usage percentage (10-100)
+        save_format: Audio format for saving (mp3/wav)
+        
+    Returns:
+        tuple: (settings dict, status message)
     """
-    device = detect_device_func()
+    try:
+        # Validate inputs and apply defaults if necessary
+        valid_formats = ["mp3", "wav"]
+        save_format = save_format if save_format in valid_formats else "mp3"
+        speed = max(0.5, min(speed, 2.0))
+        pitch = max(0.5, min(pitch, 2.0))
+        volume_gain = max(-20.0, min(volume_gain, 20.0))
+        threads_percent = max(10, min(threads_percent, 100))
 
-    # Validate inputs and apply defaults if necessary
-    valid_formats = ["mp3", "wav"]
-    save_format = save_format if save_format in valid_formats else "mp3"
-    speed = speed if 0.5 <= speed <= 2.0 else 1.0
-    pitch = pitch if 0.5 <= pitch <= 2.0 else 1.0
-    volume_gain = max(-20.0, min(volume_gain, 20.0))
-    threads_percent = threads_percent if 10 <= threads_percent <= 100 else 80
+        settings = {
+            "model_path": "./models",
+            "voice_model": model_name,
+            "speed": speed,
+            "pitch": pitch,
+            "volume_gain": volume_gain,
+            "threads_percent": threads_percent,
+            "save_format": save_format
+        }
 
-    settings = {
-        "model_path": "./models",
-        "voice_model": model_name,
-        "speed": speed,
-        "pitch": pitch,
-        "volume_gain": volume_gain,
-        "threads_percent": threads_percent if device == "CPU" else 80,
-        "save_format": save_format
-    }
+        # Ensure directory exists
+        persistent_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # Write settings with backup
+        backup_file = persistent_file.with_suffix('.yaml.bak')
+        if persistent_file.exists():
+            persistent_file.rename(backup_file)
+            
+        with open(persistent_file, 'w') as f:
+            yaml.dump(settings, f)
+            
+        if backup_file.exists():
+            backup_file.unlink()
+            
+        return settings, "Settings updated successfully!"
+        
+    except Exception as e:
+        # Restore backup if available
+        if 'backup_file' in locals() and backup_file.exists():
+            backup_file.rename(persistent_file)
+        return settings, f"Error saving settings: {str(e)}"
 
-    with open(persistent_file, 'w') as f:
-        yaml.dump(settings, f)
-    return settings, "Settings updated successfully!"
-
-
-def detect_device(nvidia_dir):
-    # detect device
-    print("Detecting device...")
-    device_is_gpu = (nvidia_dir.exists() and torch.cuda.is_available())
-    device = "GPU" if device_is_gpu else "CPU"
+def detect_device():
+    # Hardcode device to CPU
+    device = "CPU"
     print(f"Device detected: {device}")
     return device
-
 
 def get_available_models(model_dir):
     """
@@ -83,8 +107,7 @@ def get_available_models(model_dir):
                 model_list.append(relative_path)
     return model_list
 
-
-def validate_and_set_default_model(settings, available_models, persistent_file, save_persistent_settings_func, detect_device_func):
+def validate_and_set_default_model(settings, available_models, persistent_file, save_persistent_settings_func):
     """
     Ensures a valid model is selected. If not, sets a placeholder.
     """
@@ -98,8 +121,7 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
             settings["pitch"],
             settings["volume_gain"],
             settings["threads_percent"],
-            settings["save_format"],
-            detect_device_func
+            settings["save_format"]
         )
         return settings, False
 
@@ -119,12 +141,18 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
             settings["pitch"],
             settings["volume_gain"],
             settings["threads_percent"],
-            settings["save_format"],
-            detect_device_func
+            settings["save_format"]
         )
         return updated_settings, True
     return settings, True
 
+def get_system_resources():
+    """
+    Detects the number of CPU threads and available system RAM.
+    """
+    cpu_threads = psutil.cpu_count(logical=True)
+    available_ram = psutil.virtual_memory().available / (1024 ** 3)  # Convert to GB
+    return cpu_threads, available_ram
 
 def exit_program():
     """

@@ -48,7 +48,7 @@ def create_interface(
             gr.Markdown("### Configuration Options")
             model_selector = gr.Dropdown(
                 label="Select TTS Model",
-                choices=available_models,
+                choices=["Male", "Female"],  # Replace with actual voice options
                 value=default_model
             )
             speed_slider = gr.Slider(
@@ -57,13 +57,6 @@ def create_interface(
                 maximum=2.0,
                 step=0.1,
                 value=settings["speed"]
-            )
-            pitch_slider = gr.Slider(
-                label="Pitch",
-                minimum=0.5,
-                maximum=2.0,
-                step=0.1,
-                value=settings["pitch"]
             )
             volume_gain_slider = gr.Slider(
                 label="Volume Gain (dB)",
@@ -92,7 +85,7 @@ def create_interface(
             update_button = gr.Button("Update Settings")
             update_button.click(
                 fn=handle_update_settings,
-                inputs=[model_selector, speed_slider, pitch_slider, volume_gain_slider, threads_percent_slider, save_format_dropdown],
+                inputs=[model_selector, speed_slider, volume_gain_slider, threads_percent_slider, save_format_dropdown],
                 outputs=[update_status]
             )
 
