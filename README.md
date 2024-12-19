@@ -84,7 +84,7 @@ Selection; Menu Options = 1-2, Exit Program = X:
 ```
 
 ### Development
-- Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing, I think it works with Rad-TTS). Rad-TTS `https://github.com/NVIDIA/radtts` (sorta like a model).
+- Remaining Libraries for TTS; Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing). Rad-TTS `https://github.com/NVIDIA/radtts` (sorta like a model). TensorRT (up to 6x accelleration).
 - Continue to develop interface to take advantage of all useful Voices model config features.
 - Integrate image generation, intended to work along-side audio generation; if I can figure out the processing speed of each, then dynamically assign appropriate proportion of threads to, images and audio, things will happen at roughly the same time.
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
