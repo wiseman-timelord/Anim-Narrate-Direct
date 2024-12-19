@@ -110,4 +110,3 @@ def create_interface(
         )
 
     return demo
-

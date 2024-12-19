@@ -1,11 +1,8 @@
 # ./scripts/utility.py
 
-import os, json, yaml, tempfile
-from pydub import AudioSegment
-import random, string, torch
-from TTS.api import TTS
+import os
+import yaml
 from pathlib import Path
-
 
 def load_persistent_settings(persistent_file):
     # load settings
@@ -128,86 +125,6 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
         return updated_settings, True
     return settings, True
 
-def generate_tts_audio(text, model_name, model_dir, global_device, cached_text):
-    """
-    Generate TTS audio from text with detailed error handling and safe directory switching.
-    """
-    original_cwd = os.getcwd()  # Save the original working directory
-    try:
-        output_path = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, dir='./output').name
-
-        # Construct absolute paths
-        model_checkpoint = (model_dir / model_name).resolve()
-        model_root = model_checkpoint.parent
-        config_path = (model_root / "config.json").resolve()
-        supplemental_dir = (model_root / "supplemental").resolve()
-        speakers_file = (supplemental_dir / "speakers-base.json").resolve()
-
-        # Print the model path and folder contents for debugging
-        print(f"Model checkpoint path: {model_checkpoint}")
-        print(f"Model root folder: {model_root}")
-        print(f"Contents of model root folder: {os.listdir(model_root)}")
-
-        # Validate required files
-        required_paths = {
-            "model_checkpoint": model_checkpoint,
-            "config_path": config_path,
-            "supplemental_dir": supplemental_dir,
-            "speakers_file": speakers_file
-        }
-        missing_paths = [key for key, path in required_paths.items() if not path.exists()]
-        if missing_paths:
-            raise FileNotFoundError(f"Missing required paths: {', '.join(missing_paths)}")
-
-        # Inspect the model file before loading it
-        try:
-            print("Inspecting model file...")
-            model_data = torch.load(model_checkpoint, map_location="cpu")
-            print("Model file inspected successfully.")
-        except Exception as e:
-            print(f"Error inspecting model file: {e}")
-            return None
-
-        # Load TTS model
-        os.chdir(model_root)  # Change to the model directory
-        tts = TTS(model_path=str(model_checkpoint), config_path=str(config_path)).to(global_device)
-
-        # Check if the model is multi-speaker
-        if tts.is_multi_speaker:
-            # Load the speakers file to get the speaker index
-            with open(speakers_file, 'r') as f:
-                speakers = json.load(f)
-            speaker_idx = speakers[0]  # Use the first speaker in the list
-        else:
-            speaker_idx = None  # Single-speaker model, no speaker index needed
-
-        # Generate and save audio
-        tts.tts_to_file(text=text, file_path=output_path, speaker_idx=speaker_idx, language_idx="en")
-        cached_text.update({"text": text, "audio_path": output_path})
-        return output_path
-
-    except FileNotFoundError as e:
-        print(f"File error during TTS generation: {e}")
-        return None
-    except Exception as e:
-        print(f"Error during TTS generation: {e}")
-        return None
-    finally:
-        os.chdir(original_cwd)  # Restore the original working directory
-
-
-def save_audio(audio_path, preferred_format, volume_gain):
-    # save audio
-    try:
-        audio = AudioSegment.from_wav(audio_path)
-        audio = audio + volume_gain
-        random_hash = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-        output_name = f"./output/{random_hash}.{preferred_format}"
-        audio.export(output_name, format=preferred_format)
-        return output_name
-    except:
-        return None
-
 
 def exit_program():
     """
@@ -228,4 +145,3 @@ def exit_program():
     # Terminate the Python script
     print("Exiting program...")
     os._exit(0)
-
