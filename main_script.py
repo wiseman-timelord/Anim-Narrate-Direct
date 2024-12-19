@@ -9,7 +9,7 @@ import yaml
 from scripts import utility
 from scripts.utility import exit_program
 from scripts.interface import create_interface
-
+from scripts.generate import generate_tts_audio, save_audio
 
 # Globals
 CACHED_TEXT = {"text": None, "audio_path": None}  # Ensure this global is defined
@@ -48,22 +48,25 @@ initial_audio_status = "New Session"
 
 
 # Handler functions (remain here to access globals)
-def handle_generate_and_play(text):
-    global CACHED_TEXT  # Explicitly declare to modify the global variable
+def handle_generate_and_play(text, speaker_wav=None, language="en"):
+    global CACHED_TEXT
     audio_status = "Generating Audio"
-    audio_path = utility.generate_tts_audio(text, settings["voice_model"], MODEL_DIR, GLOBAL_DEVICE, CACHED_TEXT)
-    if audio_path:
-        audio_status = "Audio Generated"
-    else:
-        audio_status = "Error Generating Audio"
-    return audio_status
-
+    audio_path = generate_tts_audio(
+        text,
+        settings["voice_model"],
+        MODEL_DIR,
+        GLOBAL_DEVICE,
+        CACHED_TEXT,
+        speaker_wav=speaker_wav,
+        language=language
+    )
+    return "Audio Generated" if audio_path else "Error Generating Audio"
 
 
 def handle_save_audio():
     global CACHED_TEXT  # Access the global variable
     if CACHED_TEXT["audio_path"]:
-        saved_path = utility.save_audio(CACHED_TEXT["audio_path"], settings["save_format"], settings["volume_gain"])
+        saved_path = save_audio(CACHED_TEXT["audio_path"], settings["save_format"], settings["volume_gain"])
         if saved_path:
             return "Audio Saved"
         else:
@@ -148,4 +151,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
