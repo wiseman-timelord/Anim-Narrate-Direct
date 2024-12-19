@@ -28,18 +28,14 @@ The application's interface is divided into two main parts:
     Tts-Narrate-Gen - Bash Menu
 ================================================================================
 
-    1. Launch Main Program
+    1. Launch Tts-Narrate-Gen
 
-    2. Install And Remove
+    2. Install Libraries And Files.
+
+    3. Remove Installations.
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-2, Exit Program = X: 1
-Activating virtual environment...
-Using Python version: Python 3.11.9
-Running main_script.py with virtual environment Python...
-* Running on local URL:  http://0.0.0.0:7860
-
-To create a public link, set `share=True` in `launch()`.
+Selection; Menu Options = 1-3, Exit Program = X:
 ```
 
 ### Requirements
