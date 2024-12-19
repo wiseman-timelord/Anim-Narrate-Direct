@@ -84,9 +84,10 @@ To create a public link, set `share=True` in `launch()`.
 ```
 
 ### Development
-- TTS is not maintained, need `coqui-tts`, possibly it will fix the issues I have had, or otherwise will have to consider other options. Is it 3.12?
-- Correct interface.
-- Test features.
+- TTS was limited to Python 3.11, ended in non-progressive issues. Instead using `coqui-tts`, as 3.12 compatible.
+- Continue to develop interface to take advantage of all useful Voices model config features.
+- Testing and fixing
+- Completion, inc update page.
 
 ### Credits
 - TTS is used, check it out [TTS](https://github.com/coqui-ai/TTS).
