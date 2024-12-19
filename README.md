@@ -28,16 +28,14 @@ The application's interface is divided into two main parts:
     Tts-Narrate-Gen - Bash Menu
 ================================================================================
 
-    1. Launch Main Program
+    1. Launch Tts-Narrate-Gen
 
-    2. Check/Get Python 3.11
+    2. Check/Manage Python 3.11
 
-    3. Install Program Files
-
-    4. Remove Program Files
+    3. Check/Manage Libraries/Files
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-4, Exit Program = X:
+Selection; Menu Options = 1-3, Exit Program = X: 
 ```
 
 ### Requirements
