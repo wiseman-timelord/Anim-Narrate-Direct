@@ -30,12 +30,10 @@ The application's interface is divided into two main parts:
 
     1. Launch Tts-Narrate-Gen
 
-    2. Check/Manage Python 3.11
-
-    3. Check/Manage Libraries/Files
+    2. Check/Manage Libraries/Files
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-3, Exit Program = X: 
+Selection; Menu Options = 1-2, Exit Program = X: 
 ```
 
 ### Requirements
