@@ -35,7 +35,17 @@ The application's interface is divided into two main parts:
     3. Remove Installations.
 
 --------------------------------------------------------------------------------
-Selection; Menu Options = 1-3, Exit Program = X:
+Selection; Menu Options = 1-3, Exit Program = X: 1
+Activating virtual environment...
+Using Python version: Python 3.12.7
+Launching Tts-Narrate-Gen...
+Detecting device...
+Device detected: cuda
+Global device set to: cuda
+* Running on local URL:  http://0.0.0.0:6942
+
+To create a public link, set `share=True` in `launch()`.
+
 ```
 
 ### Requirements
