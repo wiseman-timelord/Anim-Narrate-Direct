@@ -55,7 +55,8 @@ Selection; Menu Options = 1-2, Exit Program = X:
 - For, hardware change and development, option `3. Remove Installation` results in remove installation, excluding, `./models` and `./output`, amd them select option `2` after to re-install.  
 
 ### Notation
-- TTS Required Python ~3.11, and had no version for ~3.12 at the time of creation of my project, hence, there is my first linux installer that also installs python.
+- TTS libraries, failed implementations: TTS and Corqui-TTS, required Python ~3.11. Py3-TTS turned out to be oldschool tts.
+
 
 ### File Structure
 - 5 Scripts...
@@ -83,7 +84,7 @@ Selection; Menu Options = 1-2, Exit Program = X:
 ```
 
 ### Development
-- TTS AND Corqui-TTS, was limited to Python 3.11, ended in non-progressive issues and complexity. Now using Py3-TTS, as 3.12 compatible.
+- Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing, I think it works with Rad-TTS). Rad-TTS `https://github.com/NVIDIA/radtts` (sorta like a model).
 - Continue to develop interface to take advantage of all useful Voices model config features.
 - Integrate image generation, intended to work along-side audio generation; if I can figure out the processing speed of each, then dynamically assign appropriate proportion of threads to, images and audio, things will happen at roughly the same time.
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
