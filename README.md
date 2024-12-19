@@ -91,8 +91,8 @@ Selection; Menu Options = 1-2, Exit Program = X:
 - Completion, inc update page.
 
 ### Credits
-- TTS is used, check it out [TTS](https://github.com/coqui-ai/TTS).
 - Voices on Huggingface [Voices](https://huggingface.co/voices) 
+- Other stuff will be credited later.
 
 ## DISCLAIMER:
 This project is currently in Alpha. Features and functionalities are subject to change as development progresses.
