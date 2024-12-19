@@ -2,7 +2,6 @@
 
 import os
 from pathlib import Path
-import torch
 import yaml
 
 # Import utilities and interface
@@ -16,83 +15,105 @@ CACHED_TEXT = {"text": None, "audio_path": None}  # Ensure this global is define
 PERSISTENT_FILE = Path("./data/persistent.yaml")
 MODEL_DIR = Path("./models")
 OUTPUT_DIR = Path("./output")
-NVIDIA_DIR = Path("./venv/lib/python3.11/site-packages/nvidia")
-
-GLOBAL_DEVICE = "cuda" if NVIDIA_DIR.exists() and torch.cuda.is_available() else "cpu"
-print(f"Global device set to: {GLOBAL_DEVICE}")
 
 # Load initial settings
 settings = utility.load_persistent_settings(PERSISTENT_FILE)
-device = utility.detect_device(NVIDIA_DIR)
 
 available_models = utility.get_available_models(MODEL_DIR)
 settings, _ = utility.validate_and_set_default_model(
     settings,
     available_models,
     PERSISTENT_FILE,
-    utility.save_persistent_settings,
-    lambda: utility.detect_device(NVIDIA_DIR)
+    utility.save_persistent_settings
 )
-
-if device == "CPU":
-    tp = settings.get("threads_percent", 80)
-    total_threads = os.cpu_count() or 1
-    threads_to_set = max(1, int(total_threads * (tp / 100)))
-    torch.set_num_threads(threads_to_set)
-    threads_slider_initial_visible = True
-else:
-    threads_slider_initial_visible = False
 
 default_model = settings["voice_model"] if settings["voice_model"] in available_models else (available_models[0] if available_models else "No models available")
 initial_audio_status = "New Session"
 
-
 # Handler functions (remain here to access globals)
-def handle_generate_and_play(text, speaker_wav=None, language="en"):
-    global CACHED_TEXT
-    audio_status = "Generating Audio"
-    audio_path = generate_tts_audio(
-        text,
-        settings["voice_model"],
-        MODEL_DIR,
-        GLOBAL_DEVICE,
-        CACHED_TEXT,
-        speaker_wav=speaker_wav,
-        language=language
-    )
-    return "Audio Generated" if audio_path else "Error Generating Audio"
-
+def handle_generate_and_play(text):
+    global CACHED_TEXT, settings
+    
+    if not text or not isinstance(text, str):
+        return "Error: Invalid text input"
+    
+    if len(text.strip()) == 0:
+        return "Error: Empty text input"
+    
+    try:
+        audio_status = "Generating Audio..."
+        
+        # Validate settings
+        if not settings or not isinstance(settings, dict):
+            print("Error: Invalid settings configuration")
+            return "Error: Invalid configuration"
+            
+        if "voice_model" not in settings:
+            print("Error: No voice model configured")
+            return "Error: No voice model available"
+        
+        audio_path = generate_tts_audio(
+            text,
+            settings["voice_model"],
+            MODEL_DIR,
+            CACHED_TEXT,
+            settings
+        )
+        
+        if not audio_path:
+            return "Error: Failed to generate audio"
+            
+        if not os.path.exists(audio_path):
+            return "Error: Generated audio file not found"
+            
+        # Verify file is not empty
+        if os.path.getsize(audio_path) == 0:
+            return "Error: Generated audio file is empty"
+            
+        return "Audio Generated Successfully"
+        
+    except Exception as e:
+        print(f"Error in handle_generate_and_play: {e}")
+        return f"Error: Failed to generate audio - {str(e)}"
 
 def handle_save_audio():
-    global CACHED_TEXT  # Access the global variable
-    if CACHED_TEXT["audio_path"]:
-        saved_path = save_audio(CACHED_TEXT["audio_path"], settings["save_format"], settings["volume_gain"])
-        if saved_path:
-            return "Audio Saved"
-        else:
-            return "Error Saving Audio"
-    else:
-        return "No Audio To Save"
-
+    global CACHED_TEXT
+    
+    if not CACHED_TEXT:
+        return "Error: No cached audio data"
+        
+    if not CACHED_TEXT.get("audio_path"):
+        return "Error: No audio file to save"
+        
+    if not os.path.exists(CACHED_TEXT["audio_path"]):
+        return "Error: Cached audio file not found"
+        
+    try:
+        saved_path = save_audio(
+            CACHED_TEXT["audio_path"],
+            settings.get("save_format", "mp3"),
+            settings.get("volume_gain", 0.0)
+        )
+        
+        if not saved_path:
+            return "Error: Failed to save audio"
+            
+        if not os.path.exists(saved_path):
+            return "Error: Saved audio file not found"
+            
+        return f"Audio saved successfully: {os.path.basename(saved_path)}"
+        
+    except Exception as e:
+        print(f"Error in handle_save_audio: {e}")
+        return f"Error: Failed to save audio - {str(e)}"
 
 def handle_restart_session():
     print("Restarting session and reloading settings...")
-    global settings, device, available_models
+    global settings, available_models
 
     # Reload settings
     settings = utility.load_persistent_settings(PERSISTENT_FILE)
-    device = utility.detect_device(NVIDIA_DIR)
     available_models = utility.get_available_models(MODEL_DIR)
-
-    if device == "CPU":
-        tp = settings.get("threads_percent", 80)
-        total_threads = os.cpu_count() or 1
-        threads_to_set = max(1, int(total_threads * (tp / 100)))
-        print(f"Setting number of threads to: {threads_to_set}")
-        torch.set_num_threads(threads_to_set)
-        visible = True
-    else:
-        visible = False
 
     if settings["voice_model"] not in available_models:
         print(f"Current voice_model '{settings['voice_model']}' not found in available models. Updating settings.")
@@ -108,13 +129,11 @@ def handle_restart_session():
             settings["pitch"],
             settings["volume_gain"],
             settings["threads_percent"],
-            settings["save_format"],
-            lambda: utility.detect_device(NVIDIA_DIR)
+            settings["save_format"]
         )
 
     print("Session restarted and settings reloaded.")
-    return "Session Restarted and Settings Reloaded!", gr.update(visible=visible)
-
+    return "Session Restarted and Settings Reloaded!"
 
 def handle_update_settings(model_name, speed, pitch, volume_gain, threads_percent, save_format):
     updated_settings, msg = utility.save_persistent_settings(
@@ -124,14 +143,12 @@ def handle_update_settings(model_name, speed, pitch, volume_gain, threads_percen
         pitch,
         volume_gain,
         threads_percent,
-        save_format,
-        lambda: utility.detect_device(NVIDIA_DIR)
+        save_format
     )
     # Update global settings after saving
     global settings
     settings = updated_settings
     return msg
-
 
 def main():
     demo = create_interface(
@@ -139,7 +156,6 @@ def main():
         default_model=default_model,
         initial_audio_status=initial_audio_status,
         settings=settings,
-        threads_slider_initial_visible=threads_slider_initial_visible,
         handle_generate_and_play=handle_generate_and_play,
         handle_save_audio=handle_save_audio,
         handle_restart_session=handle_restart_session,
@@ -147,7 +163,6 @@ def main():
         handle_update_settings=handle_update_settings
     )
     demo.launch(server_name="0.0.0.0", server_port=6942)
-
 
 if __name__ == "__main__":
     main()
