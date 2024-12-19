@@ -2,7 +2,7 @@
 Status: Alpha
 
 ### Description
-The project is being set up with the intent to offer a Gradio-based interface for generating narrations. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from text. The program can be used for various applications such as creating narrations for images, timed videos, or as part of multimedia presentations. Narrate educational content, provide audio for visual presentations, and facilitate language learning with diverse accents and dialects.
+The project is being worked through, but currently a bit of nightmare with the TTS libraries repeatingly being for python 3.11. The intent is to offer a Gradio-based interface for generating narrations. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from text. The program can be used for various applications such as creating narrations for images, timed videos, or as part of multimedia presentations. Narrate educational content, provide audio for visual presentations, and facilitate language learning with diverse accents and dialects.
 
 ### FEATURES
 - **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
