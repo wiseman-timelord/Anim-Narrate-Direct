@@ -94,7 +94,7 @@ install_requirements() {
     echo "Installing requirements..."
     # Use system Python to run pip in the virtual environment
     "./venv/bin/pip" install --upgrade pip
-    "./venv/bin/pip" install gradio transformers torch pydub ffmpeg-python huggingface_hub PyYAML py3-tts
+    "./venv/bin/pip" install gradio pydub ffmpeg-python PyYAML pyttsx3
     echo "Requirements installed successfully."
 }
 
@@ -177,7 +177,7 @@ while true; do
     echo ""
     echo "    1. Launch Tts-Narrate-Gen"
     echo ""
-    echo "    2. Check/Manage Libraries/Files"
+    echo "    2. Manage Libraries/Files"
     echo ""
     print_footer_separator
     echo -n "Selection; Menu Options = 1,2, Exit Program = X: "
