@@ -85,8 +85,10 @@ Selection; Menu Options = 1-3, Exit Program = X:
 ```
 
 ### Development
-- TTS was limited to Python 3.11, ended in non-progressive issues. Instead using `coqui-tts`, as 3.12 compatible.
+- TTS AND Corqui-TTS, was limited to Python 3.11, ended in non-progressive issues and complexity. Now using Py3-TTS, as 3.12 compatible.
 - Continue to develop interface to take advantage of all useful Voices model config features.
+- Integrate image generation, intended to work along-side audio generation; if I can figure out the processing speed of each, then dynamically assign appropriate proportion of threads to, images and audio, things will happen at roughly the same time.
+- Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
 - Testing and fixing
 - Completion, inc update page.
 
