@@ -96,7 +96,7 @@ Selection; Menu Options = 1-2, Exit Program = X:
 0003, "Example text, intended to be narrated.", "Words or Phrases, separated, by commas, for, image generation."
 ...
 Etc...
-```   .
+```
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
 - Testing and fixing
 - Completion, inc update page.
