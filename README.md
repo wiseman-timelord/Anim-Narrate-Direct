@@ -87,7 +87,16 @@ Selection; Menu Options = 1-2, Exit Program = X:
 
 ### Development
 - Testing, Bugfixing, Improvement.
-- Plan image generation, intended to work along-side audio generation. Some kind, .
+- Plan image generation, there would be required a rotation between, audio and image, for files to be named in, serial and parrallel, in `./output` folder. The idea is to be able to then throw the matching audio/images into video editing software. Possibly the images and audio could also have the length of the duration of the audio to be written into the labels, to enable better syncronization with batch processing code, soes for program to know how long to show each image, it would have to be seconds and split seconds ./output`A####_T####.mp3/wav` for audio where `Audio #### _ Time ##:## . extension`, while images would be `I####_T####.png/jpg` where `Image #### _ Time ##:## . extension`. 
+- there would need to be a format of file for input...
+```
+0000,"Example text, intended to be narrated.", "Words or Phrases, separated, by commas, for, image generation."
+0001, "Example text, intended to be narrated.", "Words or Phrases, separated, by commas, for, image generation."
+0002, "Example text, intended to be narrated.", "Words or Phrases, separated, by commas, for, image generation."
+0003, "Example text, intended to be narrated.", "Words or Phrases, separated, by commas, for, image generation."
+...
+Etc...
+```   .
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
 - Testing and fixing
 - Completion, inc update page.
