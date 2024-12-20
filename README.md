@@ -26,10 +26,10 @@ The application's interface is divided into two main parts:
 - Terminal, Menu and Launch:
 ```
 ================================================================================
-    Tts-Narrate-Gen - Bash Menu
+    Anim-Narrate-Direct - Bash Menu
 ================================================================================
 
-    1. Launch Tts-Narrate-Gen
+    1. Launch Anim-Narrate-Direct
 
     2. Manage Libraries/Files
 
