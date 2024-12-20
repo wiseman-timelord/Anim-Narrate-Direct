@@ -137,19 +137,47 @@ def handle_restart_session():
     return "Session Restarted and Settings Reloaded!"
 
 def handle_update_settings(model_name, speed, pitch, volume_gain, threads_percent, save_format):
-    updated_settings, msg = utility.save_persistent_settings(
-        PERSISTENT_FILE,
-        model_name,
-        speed,
-        pitch,
-        volume_gain,
-        threads_percent,
-        save_format
-    )
-    # Update global settings after saving
-    global settings
-    settings = updated_settings
-    return msg
+    """
+    Update settings with validation and error handling.
+    
+    Args:
+        model_name (str): Name of the voice model
+        speed (float): Speed multiplier (0.5-2.0)
+        pitch (float): Pitch multiplier (0.5-2.0)
+        volume_gain (float): Volume adjustment in dB (-20.0-20.0)
+        threads_percent (int): CPU thread usage percentage (10-100)
+        save_format (str): Audio format for saving (mp3/wav)
+        
+    Returns:
+        str: Status message indicating success or failure
+    """
+    try:
+        # Validate inputs before updating
+        if not model_name or model_name not in available_models:
+            return "Error: Invalid model selection"
+            
+        # Update settings using the utility function
+        updated_settings, msg = utility.save_persistent_settings(
+            PERSISTENT_FILE,
+            model_name,
+            float(speed),
+            float(pitch),
+            float(volume_gain),
+            int(threads_percent),
+            save_format
+        )
+        
+        # Update global settings if successful
+        if updated_settings:
+            global settings
+            settings = updated_settings
+            return msg
+        return "Error updating settings"
+        
+    except Exception as e:
+        print(f"Error in handle_update_settings: {e}")
+        return f"Error: Failed to update settings - {str(e)}"
+
 
 def main():
     # Check if CUDA is available
