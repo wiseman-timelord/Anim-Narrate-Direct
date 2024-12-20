@@ -102,7 +102,7 @@ def get_available_models(model_dir):
     model_list = []
     for root, _, files in os.walk(model_dir):
         for file in files:
-            if file.endswith(".pth"):
+            if file.endswith(".ckpt"):
                 relative_path = os.path.relpath(os.path.join(root, file), model_dir)
                 model_list.append(relative_path)
     return model_list
@@ -128,7 +128,7 @@ def validate_and_set_default_model(settings, available_models, persistent_file, 
     if settings["voice_model"] not in available_models:
         print(f"Default model '{settings['voice_model']}' not found. Selecting the first available model.")
         
-        # Print the model folder that contains the .pth file
+        # Print the model folder that contains the .ckpt file
         if available_models:
             selected_model_folder = available_models[0].split("/")[0]  # Extract the folder name
             print(f"Selected model folder: {selected_model_folder}")

@@ -2,11 +2,13 @@
 
 import os
 import tempfile
-import pyttsx3
-from pydub import AudioSegment
+from speechbrain.pretrained import Tacotron2
+from speechbrain.pretrained import HIFIGAN
+import torchaudio
 import random
 import string
 import atexit
+import torch
 
 # Global to track temporary files
 temp_files = set()
@@ -25,7 +27,7 @@ atexit.register(cleanup_temp_files)
 
 def generate_tts_audio(text, model_name, model_dir, cached_text, settings=None):
     """
-    Generate TTS audio from text using pyttsx3.
+    Generate TTS audio from text using SpeechBrain's Tacotron2 and HIFIGAN.
     
     Args:
         text: Input text to convert to speech
@@ -44,7 +46,6 @@ def generate_tts_audio(text, model_name, model_dir, cached_text, settings=None):
     if settings is None:
         settings = {}
     
-    engine = None
     output_path = None
     
     try:
@@ -55,19 +56,27 @@ def generate_tts_audio(text, model_name, model_dir, cached_text, settings=None):
         output_path = tempfile.NamedTemporaryFile(suffix=".wav", delete=False, dir='./output').name
         temp_files.add(output_path)
 
-        # Initialize pyttsx3 engine
-        engine = pyttsx3.init()
+        # Initialize Tacotron2 and HIFIGAN models
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+        tacotron2 = Tacotron2.from_hparams(
+            source="speechbrain/tts-tacotron2-ljspeech",
+            savedir=os.path.join(model_dir, "tacotron2"),
+            run_opts={"device": device}
+        )
+        hifi_gan = HIFIGAN.from_hparams(
+            source="speechbrain/tts-hifigan-ljspeech",
+            savedir=os.path.join(model_dir, "hifigan"),
+            run_opts={"device": device}
+        )
 
-        # Validate and set properties
-        speed = max(0.5, min(float(settings.get('speed', 1.0)), 2.0))
-        volume = max(0.0, min(float(settings.get('volume', 1.0)), 1.0))
+        # Running the TTS
+        mel_output, mel_length, alignment = tacotron2.encode_text(text)
 
-        engine.setProperty('rate', int(150 * speed))
-        engine.setProperty('volume', volume)
+        # Running Vocoder (spectrogram-to-waveform)
+        waveforms = hifi_gan.decode_batch(mel_output)
 
-        # Generate audio
-        engine.save_to_file(text, output_path)
-        engine.runAndWait()
+        # Save the waveform
+        torchaudio.save(output_path, waveforms.squeeze(1).cpu(), 22050)
 
         if not os.path.exists(output_path):
             raise FileNotFoundError("TTS engine failed to create audio file")
@@ -81,12 +90,6 @@ def generate_tts_audio(text, model_name, model_dir, cached_text, settings=None):
 
     except Exception as e:
         print(f"Error during TTS generation: {e}")
-        if engine:
-            try:
-                engine.stop()
-            except:
-                pass
-                
         if output_path and os.path.exists(output_path):
             try:
                 os.remove(output_path)
@@ -94,13 +97,7 @@ def generate_tts_audio(text, model_name, model_dir, cached_text, settings=None):
             except:
                 pass
         return None
-        
-    finally:
-        if engine:
-            try:
-                engine.stop()
-            except:
-                pass
+
 def save_audio(audio_path, preferred_format, volume_gain):
     """
     Save audio with proper error handling and file management
