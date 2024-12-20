@@ -6,8 +6,8 @@ Tts-Narrate-Gen is a Gradio-based interface for generating high-quality narratio
 
 ### FEATURES
 - **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
-  - **Narrator Page**: Features a single-column text box for user input and buttons to generate, play, and save audio.
-  - **Configuration Page**: Allows users to configure TTS parameters, model settings, and view hardware details, with an "Update Settings" button for applying changes.
+- **Narrator Page**: Features a single-column text box for user input and buttons to generate, play, and save audio.
+- **Configuration Page**: Allows users to configure TTS parameters, model settings, and view hardware details, with an "Update Settings" button for applying changes.
 - **Dynamic Model Support**: Capable of loading and utilizing various TTS models from the `speechbrain` library.
 - **CUDA Support**: Optimized for CUDA-enabled GPUs, providing faster audio generation.
 - **Multi-Language and Multi-Speaker Support**: Supports generating speech in multiple languages and different speaker voices, making it versatile for various narration needs.
