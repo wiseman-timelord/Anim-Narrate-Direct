@@ -41,7 +41,7 @@ Selection; Menu Options = 1-2, Exit Program = X:
 - **Linux**: Designed for modern Ubuntu/Debian-compatible systems. Tested on Ubuntu 24.
 - **Python 3.12**: The project uses Python 3.12. Ensure it is installed on your system.
 - **nVidia CUDA**: For "Unified Memory` with, faster audio generation but on system memory.
-- **TTS Models**: Ensure you have (SpeechBrain based Models)[https://huggingface.co/speechbrain] for SpeachBrain library to work.
+- **TTS Models**: Ensure you have (SpeechBrain compatible Models)[https://huggingface.co/speechbrain] for SpeachBrain library to work.
 
 ### Usage
 1. Installation - Download the latest release and unpack it in a suitable directory.
