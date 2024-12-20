@@ -1,5 +1,5 @@
 # Tts-Narrate-Gen
-Status: Alpha
+Status: Alpha (early version)
 
 ### Description
 Tts-Narrate-Gen is a Gradio-based interface for generating high-quality narrations from text. It utilizes advanced machine learning models from `speechbrain` to convert text into spoken audio, supporting multiple languages and voices. The project is designed to provide a user-friendly interface for generating narrations from sections of text, with support for CUDA-enabled GPUs for accelerated processing.
