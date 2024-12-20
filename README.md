@@ -98,6 +98,9 @@ Selection; Menu Options = 1-2, Exit Program = X:
 Etc...
 ```
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
+- Ability to strip down a descriptive script into lines with individual sentences, for processing. Ie, input text files.
+- Ability to code video, and save video file, to complete the process of, document in - narrated animation out.
+- Ability to generate music, to add a fitting generated jingle at start and end. Dreaming here to get all of it together, but we see how far we get.
 - Testing and fixing
 - Completion, inc update page.
 - Interesting Libraries for later consideration; Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing). Rad-TTS `https://github.com/NVIDIA/radtts` (speech synthasis with its own model https://drive.google.com/file/d/1Rb2VMUwQahGrnpFSlAhCPh7OpDN3xgOr/view?usp=sharing). TensorRT (up to 6x accelleration).
