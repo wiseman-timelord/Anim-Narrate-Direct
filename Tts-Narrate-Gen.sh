@@ -12,181 +12,143 @@ print_footer_separator() {
 }
 
 check_python_version() {
-    # Try different possible Python commands
+    # Check Python version
     if command -v python3.12 >/dev/null 2>&1; then
         PYTHON_CMD="python3.12"
     elif command -v python3 >/dev/null 2>&1; then
-        # Check if python3 is version 3.12
         PYTHON_VERSION=$(python3 -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-        if [[ "$PYTHON_VERSION" == "3.12" ]]; then
-            PYTHON_CMD="python3"
-        else
-            echo "Error: Python 3.12 is required. Found version: $PYTHON_VERSION"
-            sleep 3
-            return 1
-        fi
+        [[ "$PYTHON_VERSION" == "3.12" ]] && PYTHON_CMD="python3" || { echo "Error: Python 3.12 required"; sleep 3; return 1; }
     elif command -v python >/dev/null 2>&1; then
-        # Check if python is version 3.12
         PYTHON_VERSION=$(python -c 'import sys; print(".".join(map(str, sys.version_info[:2])))')
-        if [[ "$PYTHON_VERSION" == "3.12" ]]; then
-            PYTHON_CMD="python"
-        else
-            echo "Error: Python 3.12 is required. Found version: $PYTHON_VERSION"
-            sleep 3
-            return 1
-        fi
+        [[ "$PYTHON_VERSION" == "3.12" ]] && PYTHON_CMD="python" || { echo "Error: Python 3.12 required"; sleep 3; return 1; }
     else
-        echo "Error: Python 3.12 is not found!"
+        echo "Error: Python 3.12 not found!"
         sleep 3
         return 1
     fi
-
-    echo "Python 3.12 found as command: $PYTHON_CMD"
+    echo "Python 3.12 found: $PYTHON_CMD"
     export PYTHON_CMD
     sleep 1
     return 0
 }
 
 check_sudo() {
-    if [[ $EUID -ne 0 ]]; then
-        echo "Error: Sudo Authorization Required!"
-        exit 1
-    fi
-    echo "Sudo authorization confirmed."
+    # Check sudo
+    [[ $EUID -ne 0 ]] && { echo "Error: Sudo required!"; exit 1; }
+    echo "Sudo confirmed."
 }
 
 activate_env_if_needed() {
-    # Use the Python command we found earlier
+    # Activate venv
     SYSTEM_PYTHON=$(which $PYTHON_CMD)
-    
-    if [ ! -d "./venv" ]; then
-        echo "Virtual environment not found. Creating one now..."
-        $PYTHON_CMD -m venv ./venv
-        if [ $? -ne 0 ]; then
-            echo "Error: Failed to create virtual environment. Check Python installation."
-            exit 1
-        fi
-        chmod -R 777 ./venv
-        echo "Virtual environment created successfully."
-    fi
+    [ ! -d "./venv" ] && { echo "Creating venv..."; $PYTHON_CMD -m venv ./venv || { echo "Error: Venv creation failed"; exit 1; }; chmod -R 777 ./venv; echo "Venv created."; }
     source ./venv/bin/activate
     ENV_ACTIVE=1
-    echo "Virtual environment activated."
+    echo "Venv activated."
 }
 
 deactivate_env_if_active() {
-    if [ $ENV_ACTIVE -eq 1 ]; then
-        deactivate
-        ENV_ACTIVE=0
-        echo "Virtual environment deactivated."
-    fi
+    # Deactivate venv
+    [ $ENV_ACTIVE -eq 1 ] && { deactivate; ENV_ACTIVE=0; echo "Venv deactivated."; }
 }
 
 create_folders() {
+    # Create folders
     for folder in "./models" "./output" "./data"; do
         mkdir -p "$folder"
         chmod -R 777 "$folder"
     done
-    echo "Directories created and permissions set."
+    echo "Directories created."
 }
 
 install_requirements() {
-    echo "Installing requirements..."
-    # Use system Python to run pip in the virtual environment
+    # Install requirements
     "./venv/bin/pip" install --upgrade pip
-    "./venv/bin/pip" install gradio pydub ffmpeg-python PyYAML pyttsx3
-    echo "Requirements installed successfully."
+    "./venv/bin/pip" install speechbrain torchaudio pydub ffmpeg-python PyYAML
+    echo "Requirements installed."
+}
+
+create_persistent_yaml() {
+    # Create persistent YAML
+    PERSISTENT_FILE="./data/persistent.yaml"
+    [ ! -f "$PERSISTENT_FILE" ] && {
+        cat <<EOL > "$PERSISTENT_FILE"
+model_path: "./models"
+voice_model: "default"
+speed: 1.0
+pitch: 1.0
+volume_gain: 0.0
+threads_percent: 80
+save_format: "mp3"
+EOL
+        echo "Persistent YAML created."
+    } || echo "Persistent YAML exists."
 }
 
 manage_program_files() {
+    # Manage program files
     print_header_separator
-    echo "    Manage Program Files - Install or Remove"
+    echo "Manage Program Files"
     print_header_separator
     echo ""
     if [ -d "./data" ]; then
-        echo "Program files are currently installed."
-        echo "Would you like to remove them? (y/n)"
+        echo "Files installed."
+        echo "Remove? (y/n)"
         read -r remove_choice
-        if [[ "$remove_choice" =~ ^[Yy]$ ]]; then
-            rm -rf ./venv ./data ./models ./output
-            echo "Program files removed successfully."
-        else
-            echo "No changes made. Returning to menu..."
-        fi
+        [[ "$remove_choice" =~ ^[Yy]$ ]] && { rm -rf ./venv ./data ./models ./output; echo "Files removed."; } || echo "No changes."
     else
-        echo "Program files are not currently installed."
-        echo "Would you like to install them? (y/n)"
+        echo "Files not installed."
+        echo "Install? (y/n)"
         read -r install_choice
-        if [[ "$install_choice" =~ ^[Yy]$ ]]; then
-            if check_python_version; then
-                create_folders
-                activate_env_if_needed
-                install_requirements
-                echo "Program files installed successfully."
-            else
-                echo "Installation cancelled due to Python version requirement."
-                return 1
-            fi
-        else
-            echo "No changes made. Returning to menu..."
-        fi
+        [[ "$install_choice" =~ ^[Yy]$ ]] && { check_python_version && { create_folders; activate_env_if_needed; install_requirements; create_persistent_yaml; echo "Files installed."; } || echo "Install cancelled."; } || echo "No changes."
     fi
     deactivate_env_if_active
 }
 
 launch_program() {
-    # Ensure the script runs from the correct directory
+    # Launch program
     SCRIPT_DIR=$(dirname "$(realpath "$0")")
-    cd "$SCRIPT_DIR" || { echo "Error: Could not change to script directory."; exit 1; }
-
-    # Check Python version before proceeding
-    if ! check_python_version; then
-        return 1
-    fi
-
-    # Store system Python path
+    cd "$SCRIPT_DIR" || { echo "Error: Script dir issue."; exit 1; }
+    check_python_version || return 1
     SYSTEM_PYTHON=$(which python)
-    
-    # Activate the virtual environment
     activate_env_if_needed
-
-    echo "Running main_script.py using system Python..."
+    echo "Running main_script.py"
     "$SYSTEM_PYTHON" main_script.py
-
-    # Deactivate the virtual environment after the script exits
     deactivate_env_if_active
 }
 
 End_Of_Script() {
+    # Exit sequence
     clear
     print_header_separator
-    echo "    Tts-Narrate-Gen - Exit Sequence"
+    echo "Exit Sequence"
     print_header_separator
     echo ""
-    echo "Menu Exited By User."
+    echo "Menu exited."
     deactivate_env_if_active
-    echo "Exiting In 3 Seconds..."
+    echo "Exiting in 3s..."
     sleep 3
     exit 0
 }
 
 while true; do
+    # Main menu
     print_header_separator
-    echo "    Tts-Narrate-Gen - Bash Menu"
+    echo "Tts-Narrate-Gen Menu"
     print_header_separator
     echo ""
-    echo "    1. Launch Tts-Narrate-Gen"
+    echo "1. Launch Tts-Narrate-Gen"
     echo ""
-    echo "    2. Manage Libraries/Files"
+    echo "2. Manage Libraries/Files"
     echo ""
     print_footer_separator
-    echo -n "Selection; Menu Options = 1,2, Exit Program = X: "
+    echo -n "Selection: 1,2, Exit=X: "
     read -r choice
     case "$choice" in
         1) launch_program ;;
         2) manage_program_files ;;
         X|x) End_Of_Script ;;
-        *) echo "Invalid option, try again." ;;
+        *) echo "Invalid option." ;;
     esac
     sleep 2
 done

@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import yaml
+import torch
 
 # Import utilities and interface
 from scripts import utility
@@ -151,6 +152,10 @@ def handle_update_settings(model_name, speed, pitch, volume_gain, threads_percen
     return msg
 
 def main():
+    # Check if CUDA is available
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"Running on device: {device}")
+
     demo = create_interface(
         available_models=available_models,
         default_model=default_model,
