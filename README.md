@@ -2,13 +2,14 @@
 Status: Alpha
 
 ### Description
-The project is being worked through, but currently a bit of nightmare with the TTS libraries repeatingly being for python 3.11. The intent is to offer a Gradio-based interface for generating narrations based video contents. It utilizes advanced machine learning models to convert text into spoken audio, supporting multiple languages and voices. Tts-Narrate-Gen is designed to provide a user-friendly interface for generating narrations from sections of text. The readme.md is still also being setup, and will be somewhat innacurate as the project evolves, and parts need updating.
+Tts-Narrate-Gen is a Gradio-based interface for generating high-quality narrations from text. It utilizes advanced machine learning models from `speechbrain` to convert text into spoken audio, supporting multiple languages and voices. The project is designed to provide a user-friendly interface for generating narrations from sections of text, with support for CUDA-enabled GPUs for accelerated processing.
 
 ### FEATURES
 - **Gradio Interface**: A web-based interface that allows users to interactively input text and generate narration.
-  - **Narrator Page**: Features a single-column text box for user input and three buttons: "Gen Sample", "Play Narrate", and "Save As MP3".
+  - **Narrator Page**: Features a single-column text box for user input and buttons to generate, play, and save audio.
   - **Configuration Page**: Allows users to configure TTS parameters, model settings, and view hardware details, with an "Update Settings" button for applying changes.
-- **Dynamic Model Support**: Capable of loading and utilizing various TTS models on HuggingFace, specifically I will intent to be using the ones here [Voices](https://huggingface.co/voices), that seem to have a wide enough range.
+- **Dynamic Model Support**: Capable of loading and utilizing various TTS models from the `speechbrain` library.
+- **CUDA Support**: Optimized for CUDA-enabled GPUs, providing faster audio generation.
 - **Multi-Language and Multi-Speaker Support**: Supports generating speech in multiple languages and different speaker voices, making it versatile for various narration needs.
 - **Automated File Management**: Manages audio output and settings configuration seamlessly through the interface.
 
@@ -37,9 +38,10 @@ Selection; Menu Options = 1-2, Exit Program = X:
 ```
 
 ### Requirements
-- Linux - Designed for modern Ubuntu/Debian compatible, im specifically using Ubuntu 24.
-- Python3 - It uses modern Python, libraries are installed to the VEnv at `./venv`, and requriemts is at `./data/requirements.txt`.
-- TTS Models - Programmed towards [Voices](https://huggingface.co/voices), ensure strictly to use `lfs` when you are clone. 
+- **Linux**: Designed for modern Ubuntu/Debian-compatible systems. Tested on Ubuntu 24.
+- **Python 3.12**: The project uses Python 3.12. Ensure it is installed on your system.
+- **CUDA-Enabled GPU (Optional)**: For faster audio generation, a CUDA-enabled GPU is recommended.
+- **TTS Models**: Ensure you have the required TTS models in the `./models` directory. The models should be compatible with `speechbrain`.
 
 ### Usage
 1. Installation - Download the latest release and unpack it in a suitable directory.
@@ -84,12 +86,12 @@ Selection; Menu Options = 1-2, Exit Program = X:
 ```
 
 ### Development
-- Remaining Libraries for TTS; Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing). Rad-TTS `https://github.com/NVIDIA/radtts` (speech synthasis with its own model https://drive.google.com/file/d/1Rb2VMUwQahGrnpFSlAhCPh7OpDN3xgOr/view?usp=sharing). TensorRT (up to 6x accelleration).
-- Continue to develop interface to take advantage of all useful Voices model config features.
-- Integrate image generation, intended to work along-side audio generation; if I can figure out the processing speed of each, then dynamically assign appropriate proportion of threads to, images and audio, things will happen at roughly the same time.
+- Testing, Bugfixing, Improvement.
+- Plan image generation, intended to work along-side audio generation. Some kind, .
 - Develop correct format of script to input for movie contents generation, and naming scheme. Ie, `###;example narration text, with commas, ending in full stop.; image description, words or phrases, with commas, ending in, full stop.`.
 - Testing and fixing
 - Completion, inc update page.
+- Interesting Libraries for later consideration; Nemo2.0 `https://docs.nvidia.com/nemo-framework/user-guide/latest/nemo-2.0/index.html` (state of the art Nemo-thing). Rad-TTS `https://github.com/NVIDIA/radtts` (speech synthasis with its own model https://drive.google.com/file/d/1Rb2VMUwQahGrnpFSlAhCPh7OpDN3xgOr/view?usp=sharing). TensorRT (up to 6x accelleration).
 
 ### Credits
 - Voices on Huggingface [Voices](https://huggingface.co/voices) 
